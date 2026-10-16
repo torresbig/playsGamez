@@ -19,7 +19,7 @@ let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 let ballSpeedX = 4;
 let ballSpeedY = 4;
-const ballSize = 10;
+let ballSize = 10;
 
 let difficulty = "normal";
 
@@ -64,21 +64,56 @@ const DIFFICULTY = {
         ballSpeedGain: 0.3,
         maxBallSpeed: 15,
         enemySpeed: 5.5,
-        color: "#a200ff" // Rot
+        color: "#a200ff" // Lila
     }
 };
 
 /* ============================================================
-   POWER-UP
+   POWER-UP SYSTEM
+
+   - Seltenes Spawnen, Timing komplett zufällig
+   - 10 Effekte mit eigener Farbe, Glyph und Ziel-Seite
+   - Token-Optik: kleiner roter Kern = verkleinern,
+     großer grüner Kern = vergrößern, eigene Farben sonst
+   - Effekte laufen über activeEffects (Ende-Zeitstempel)
+     und werden pro Frame neu berechnet (recomputeEffects)
 ============================================================ */
 
-let powerUpX = null;
-let powerUpY = null;
-let powerUpSize = 15;
-let powerUpActive = false;
+const POWERUP_TYPES = [
+    // Verkleinern = klein & rot, Vergrößern = groß & grün
+    { id: "shrinkEnemy",  label: "GEGNER SCHRUMPFEN",     glyph: "▼", color: "#ff2d55", radius: 11, side: "enemy",  weight: 3,   duration: 6000 },
+    { id: "growPlayer",   label: "DU WIRST RIESIG",       glyph: "▲", color: "#00ff88", radius: 18, side: "player", weight: 3,   duration: 6000 },
+    { id: "shrinkPlayer", label: "DU SCHRUMPST!",         glyph: "▼", color: "#ff2d55", radius: 11, side: "player", weight: 1.5, duration: 6000 },
+    { id: "growEnemy",    label: "GEGNER WIRD RIESIG",    glyph: "▲", color: "#00ff88", radius: 18, side: "enemy",  weight: 1.5, duration: 6000 },
+    // Special Events
+    { id: "invertPlayer", label: "STEUERUNG INVERTIERT!", glyph: "⇅", color: "#ff9500", radius: 14, side: "player", weight: 1.5, duration: 5000 },
+    { id: "confuseEnemy", label: "GEGNER IST VERWIRRT!",  glyph: "?",  color: "#ff2dd4", radius: 14, side: "enemy",  weight: 2.5, duration: 6000 },
+    { id: "curve",        label: "KURVENBALL!",           glyph: "~",  color: "#ffe600", radius: 14, side: "ball",   weight: 3,   duration: 6000 },
+    { id: "bigBall",      label: "RIESEN-BALL!",          glyph: "●",  color: "#00eaff", radius: 15, side: "ball",   weight: 2.5, duration: 7000 },
+    { id: "freezeEnemy",  label: "GEGNER EINGEFROREN!",   glyph: "❄",  color: "#7df9ff", radius: 13, side: "enemy",  weight: 2.5, duration: 2500 },
+    { id: "turboPlayer",  label: "TURBO-AKTIV!",          glyph: "⚡", color: "#ff9500", radius: 14, side: "player", weight: 2.5, duration: 6000 }
+];
 
-let shrinkTimeoutPlayer = null;
-let shrinkTimeoutEnemy = null;
+// Aktuelles Token auf dem Feld
+let powerUpActive = false;
+let powerUpType = null;
+let powerUpX = 0;
+let powerUpY = 0;
+let powerUpBornAt = 0;
+let powerUpExpiresAt = 0;
+let powerUpTimeoutId = null;
+
+// Laufende Effekte
+let activeEffects = [];   // { type, endsAt, curveSpin? }
+let enemyFrozen = false;
+let enemyConfused = false;
+let invertActive = false;
+let curveActive = false;
+let curveSpin = 0;
+
+// Optik-Events (Toast = Ankündigung, Shockwave = Einsammel-Blitz)
+let toast = null;         // { type, startAt }
+let shockwaves = [];      // { x, y, color, startAt }
 
 let lastHit = "player"; // Wer hat zuletzt den Ball berührt?
 
@@ -159,6 +194,13 @@ document.getElementById("ultraBtn").addEventListener("click", () => {
 document.getElementById("restartBtn").addEventListener("click", () => {
     playerScore = 0;
     enemyScore = 0;
+
+    // Laufende Power-Up-Effekte / Optik-Events sauber beenden
+    activeEffects = [];
+    toast = null;
+    shockwaves = [];
+    recomputeEffects();
+
     resetBallWithCountdown();
 });
 
@@ -195,7 +237,10 @@ function movePaddleToClientY(clientY) {
     if (rect.height === 0) return;
 
     const scaleY = canvas.height / rect.height;
-    const canvasY = (clientY - rect.top) * scaleY;
+    let canvasY = (clientY - rect.top) * scaleY;
+
+    // Steuerung invertiert (Power-Up): Position spiegeln
+    if (invertActive) canvasY = canvas.height - canvasY;
 
     paddleY = canvasY - paddleHeight / 2;
 
@@ -239,32 +284,121 @@ canvas.addEventListener("touchend", (e) => {
    POWER-UP LOGIK
 ============================================================ */
 
+function pickRandomPowerUp() {
+    const total = POWERUP_TYPES.reduce((sum, t) => sum + t.weight, 0);
+    let roll = Math.random() * total;
+
+    for (const t of POWERUP_TYPES) {
+        roll -= t.weight;
+        if (roll <= 0) return t;
+    }
+    return POWERUP_TYPES[0];
+}
+
 function spawnPowerUp() {
-    powerUpX = Math.random() * (canvas.width - 100) + 50;
-    powerUpY = Math.random() * (canvas.height - 100) + 50;
+    if (powerUpTimeoutId !== null) clearTimeout(powerUpTimeoutId);
+
+    powerUpType = pickRandomPowerUp();
+    // Mittleres Drittel horizontal, nicht an den Kanten vertikal
+    powerUpX = canvas.width * 0.3 + Math.random() * canvas.width * 0.4;
+    powerUpY = 70 + Math.random() * (canvas.height - 140);
+    powerUpBornAt = performance.now();
+
+    // Wie lange das Token liegen bleibt: ebenfalls zufällig
+    const life = 10000 + Math.random() * 5000;
+    powerUpExpiresAt = powerUpBornAt + life;
     powerUpActive = true;
 
-    setTimeout(() => {
+    powerUpTimeoutId = setTimeout(() => {
         powerUpActive = false;
-    }, 15000);
+        powerUpType = null;
+        powerUpTimeoutId = null;
+    }, life);
 }
 
-function shrinkEnemy() {
-    enemyHeight = 50;
+// Spawn-Rhythmus: alles zufällig und deutlich seltener als vorher
+// (erstes Token nach 12-25 s, danach alle 24-42 s)
+function scheduleNextPowerUp(first) {
+    const delay = first
+        ? 12000 + Math.random() * 13000
+        : 24000 + Math.random() * 18000;
 
-    clearTimeout(shrinkTimeoutEnemy);
-    shrinkTimeoutEnemy = setTimeout(() => {
-        enemyHeight = 100;
-    }, 5000);
+    setTimeout(() => {
+        if (!powerUpActive) spawnPowerUp();
+        scheduleNextPowerUp(false);
+    }, delay);
 }
 
-function shrinkPlayer() {
-    paddleHeight = 50;
+function collectPowerUp() {
+    if (!powerUpType) return;
+    const type = powerUpType;
 
-    clearTimeout(shrinkTimeoutPlayer);
-    shrinkTimeoutPlayer = setTimeout(() => {
-        paddleHeight = 100;
-    }, 5000);
+    if (powerUpTimeoutId !== null) {
+        clearTimeout(powerUpTimeoutId);
+        powerUpTimeoutId = null;
+    }
+    powerUpActive = false;
+    powerUpType = null;
+
+    // Effekt aktivieren (kein Stapeln desselben Typs)
+    activeEffects = activeEffects.filter((e) => e.type.id !== type.id);
+    const effect = { type, endsAt: performance.now() + type.duration };
+    if (type.id === "curve") effect.curveSpin = Math.random() > 0.5 ? 1 : -1;
+    activeEffects.push(effect);
+
+    // Blitz-Welle am Einsammel-Punkt
+    shockwaves.push({ x: powerUpX, y: powerUpY, color: type.color, startAt: performance.now() });
+
+    recomputeEffects();
+
+    // Anzeige: was passiert + betroffene Seite
+    toast = { type, startAt: performance.now() };
+}
+
+function hasEffect(id) {
+    return activeEffects.some((e) => e.type.id === id);
+}
+
+// Alle Effekte -> Ist-Zustand (pro Frame neu berechnet,
+// damit Ablauf und sich überlagernde Effekte immer stimmen)
+function recomputeEffects() {
+    const now = performance.now();
+    activeEffects = activeEffects.filter((e) => e.endsAt > now);
+
+    // Basiswerte zurücksetzen
+    paddleHeight = 100;
+    enemyHeight = 100;
+    playerSpeed = 5;
+    ballSize = 10;
+    enemyFrozen = false;
+    enemyConfused = false;
+    invertActive = false;
+    curveActive = false;
+    curveSpin = 0;
+
+    // Aus Effekten ableiten
+    if (hasEffect("growPlayer")) paddleHeight = 150;
+    if (hasEffect("shrinkPlayer")) paddleHeight = 55;
+    if (hasEffect("growEnemy")) enemyHeight = 150;
+    if (hasEffect("shrinkEnemy")) enemyHeight = 55;
+    if (hasEffect("turboPlayer")) playerSpeed = 8.5;
+    if (hasEffect("bigBall")) ballSize = 22;
+
+    enemyFrozen = hasEffect("freezeEnemy");
+    enemyConfused = hasEffect("confuseEnemy");
+    invertActive = hasEffect("invertPlayer");
+
+    const curveFx = activeEffects.find((e) => e.type.id === "curve");
+    if (curveFx) {
+        curveActive = true;
+        curveSpin = curveFx.curveSpin || 1;
+    }
+
+    // Nach Größenwechsel wieder sauber ins Feld ziehen
+    if (paddleY < 0) paddleY = 0;
+    if (paddleY > canvas.height - paddleHeight) paddleY = canvas.height - paddleHeight;
+    if (enemyY < 0) enemyY = 0;
+    if (enemyY > canvas.height - enemyHeight) enemyY = canvas.height - enemyHeight;
 }
 
 /* ============================================================
@@ -344,21 +478,14 @@ function checkCollisions() {
         return true;
     }
 
-    // Power-Up Treffer
-    if (powerUpActive) {
-        if (
-            ballX + ballSize > powerUpX &&
-            ballX < powerUpX + powerUpSize &&
-            ballY + ballSize > powerUpY &&
-            ballY < powerUpY + powerUpSize
-        ) {
-            powerUpActive = false;
+    // Power-Up Treffer (Kreis-gegen-Ball, altes powerUpSize-Box-Problem raus)
+    if (powerUpActive && powerUpType) {
+        const dx = (ballX + ballSize / 2) - powerUpX;
+        const dy = (ballY + ballSize / 2) - powerUpY;
+        const reach = powerUpType.radius + ballSize / 2;
 
-            if (lastHit === "player") {
-                shrinkEnemy();
-            } else {
-                shrinkPlayer();
-            }
+        if (dx * dx + dy * dy <= reach * reach) {
+            collectPowerUp();
         }
     }
 
@@ -412,21 +539,45 @@ function update(dt) {
     // Gegner KI
     let enemyCenter = enemyY + enemyHeight / 2;
 
-    if (enemyCenter < ballY - 10) enemyY += enemySpeed * dt;
-    else if (enemyCenter > ballY + 10) enemyY -= enemySpeed * dt;
+    if (enemyFrozen) {
+        // Gegner eingefroren: keine Bewegung
+    } else if (enemyConfused) {
+        // Gegner verwirrt: läuft in die Gegenrichtung
+        if (enemyCenter < ballY - 10) enemyY -= enemySpeed * dt;
+        else if (enemyCenter > ballY + 10) enemyY += enemySpeed * dt;
+    } else {
+        if (enemyCenter < ballY - 10) enemyY += enemySpeed * dt;
+        else if (enemyCenter > ballY + 10) enemyY -= enemySpeed * dt;
+    }
 
     // leichtes Rauschen skaliert ebenfalls mit Modus + dt
-    enemyY += (Math.random() - 0.5) * enemySpeed * 0.35 * dt;
+    if (!enemyFrozen) {
+        enemyY += (Math.random() - 0.5) * enemySpeed * 0.35 * dt;
+    }
 
     if (enemyY < 0) enemyY = 0;
     if (enemyY > canvas.height - enemyHeight) enemyY = canvas.height - enemyHeight;
 
-    // Spieler Bewegung
-    if (upPressed) paddleY -= playerSpeed * dt;
-    if (downPressed) paddleY += playerSpeed * dt;
+    // Spieler Bewegung (ggf. invertiert: Tasten vertauscht)
+    const moveUp = invertActive ? downPressed : upPressed;
+    const moveDown = invertActive ? upPressed : downPressed;
+
+    if (moveUp) paddleY -= playerSpeed * dt;
+    if (moveDown) paddleY += playerSpeed * dt;
 
     if (paddleY < 0) paddleY = 0;
     if (paddleY > canvas.height - paddleHeight) paddleY = canvas.height - paddleHeight;
+
+    // Kurvenball: Y-Komponente sanft in Spin-Richtung ziehen,
+    // dadurch entsteht eine echte Bahn-Kurve
+    if (curveActive) {
+        const cfg = DIFFICULTY[difficulty];
+        ballSpeedY += curveSpin * 0.25 * dt;
+
+        const cap = cfg.maxBallSpeed;
+        if (ballSpeedY > cap) ballSpeedY = cap;
+        if (ballSpeedY < -cap) ballSpeedY = -cap;
+    }
 
     // Ball Bewegung in Sub-Steps (verhindert Durchrutschen)
     const dx = ballSpeedX * dt;
@@ -446,39 +597,100 @@ function update(dt) {
    DRAW
 ============================================================ */
 
+// Kleiner Helfer für abgerundete Rechtecke (Chips/Toast)
+function roundRectPath(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+// Glow-Wrapper, damit shadowBlur sauber zurückgesetzt wird
+function withGlow(color, blur, fn) {
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = blur;
+    fn();
+    ctx.restore();
+}
+
+function sideLabelOf(side) {
+    if (side === "player") return "ZIEL: DU";
+    if (side === "enemy") return "ZIEL: GEGNER";
+    return "ZIEL: BEIDE"; // Ball = neutrales Ereignis
+}
+
+function hexToRgba(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+}
+
 function draw() {
+    const now = performance.now();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!gameStarted) {
         ctx.fillStyle = "white";
         ctx.font = "60px Arial";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
         ctx.fillText(countdown.toString(), canvas.width / 2 - 20, canvas.height / 2);
         return;
     }
 
-    // Spieler
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, paddleY, paddleWidth, paddleHeight);
+    const cfg = DIFFICULTY[difficulty];
+
+    // Effekt-Glows: welches Objekt wird gerade beeinflusst?
+    const playerFx = activeEffects.find((e) => e.type.side === "player");
+    const enemyFx = activeEffects.find((e) => e.type.side === "enemy");
+    const ballFx = activeEffects.find((e) => e.type.side === "ball");
+
+    // Spieler (Glow in der Effektfarbe, sonst neutral weiß)
+    withGlow(playerFx ? playerFx.type.color : "rgba(255,255,255,0.4)", playerFx ? 25 : 8, () => {
+        ctx.fillStyle = playerFx ? playerFx.type.color : "white";
+        ctx.fillRect(0, paddleY, paddleWidth, paddleHeight);
+    });
 
     // Gegner
-    ctx.fillRect(canvas.width - paddleWidth, enemyY, paddleWidth, enemyHeight);
+    withGlow(enemyFx ? enemyFx.type.color : "rgba(255,255,255,0.4)", enemyFx ? 25 : 8, () => {
+        ctx.fillStyle = enemyFx ? enemyFx.type.color : "white";
+        ctx.fillRect(canvas.width - paddleWidth, enemyY, paddleWidth, enemyHeight);
+    });
 
-    // Ball
-    ctx.fillRect(ballX, ballY, ballSize, ballSize);
+    // Ball (großer Ball bekommt Rundung + Glow)
+    withGlow(ballFx ? ballFx.type.color : "rgba(255,255,255,0.35)", ballFx ? 22 : 6, () => {
+        ctx.fillStyle = ballFx ? ballFx.type.color : "white";
+        if (ballSize > 14) {
+            roundRectPath(ballX, ballY, ballSize, ballSize, ballSize / 2);
+            ctx.fill();
+        } else {
+            ctx.fillRect(ballX, ballY, ballSize, ballSize);
+        }
+    });
 
     // Score
-    ctx.fillStyle = "var(--main-color)";
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = cfg.color;
     ctx.font = "40px Arial";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
     ctx.fillText("Player: " + playerScore, canvas.width / 4 - 50, 60);
     ctx.fillText("Enemy: " + enemyScore, canvas.width / 4 * 3 - 50, 60);
 
-    // Power-Up
-    if (powerUpActive) {
-        ctx.fillStyle = "yellow";
-        ctx.beginPath();
-        ctx.arc(powerUpX, powerUpY, powerUpSize, 0, Math.PI * 2);
-        ctx.fill();
+    // Power-Up-Token
+    if (powerUpActive && powerUpType) {
+        drawPowerUp(now);
     }
+
+    drawShockwaves(now);      // Einsammel-Blitz
+    drawEffectChips(now);     // aktive Effekte, nach Seite gruppiert
+    drawToast(now);           // Ankündigung: was passiert + Ziel
 }
 
 /* ============================================================
@@ -500,9 +712,264 @@ function gameLoop(now) {
     // Sprünge nach Tab-Wechsel etc. begrenzen
     dt = Math.max(0, Math.min(dt, 2.5));
 
+    recomputeEffects(); // Power-Up-Effekte laufen auch ab, wenn Stillstand ist
     update(dt);
     draw();
     requestAnimationFrame(gameLoop);
+}
+
+/* ============================================================
+   POWER-UP OPTIK (Token + Einsammel-Blitz)
+============================================================ */
+
+function drawPowerUp(now) {
+    const type = powerUpType;
+    const cx = powerUpX;
+    const cy = powerUpY;
+
+    // Spawn-Pop + leichtes Pulsieren
+    const age = now - powerUpBornAt;
+    const spawn = Math.min(1, age / 350);
+    const pop = 1 + Math.sin(now / 220) * 0.07;
+    const r = type.radius * (0.3 + 0.7 * spawn) * pop;
+
+    // Restzeit-Ring
+    const lifeFrac = Math.max(0, (powerUpExpiresAt - now) / (powerUpExpiresAt - powerUpBornAt));
+
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // Äußerer Halo
+    const halo = ctx.createRadialGradient(0, 0, r * 0.5, 0, 0, r * 2.4);
+    halo.addColorStop(0, hexToRgba(type.color, 0.35));
+    halo.addColorStop(1, hexToRgba(type.color, 0));
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Kern mit Farbverlauf (weißer Glanz -> Farbe -> dunkel)
+    const core = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.1, 0, 0, r);
+    core.addColorStop(0, "#ffffff");
+    core.addColorStop(0.35, type.color);
+    core.addColorStop(1, hexToRgba(type.color, 0.55));
+
+    withGlow(type.color, 30, () => {
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Heller Rand
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(255,255,255,0.9)";
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Rotierender gestrichelter Ring
+    ctx.save();
+    ctx.rotate((now / 1000) * 1.6);
+    ctx.strokeStyle = hexToRgba(type.color, 0.9);
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.arc(0, 0, r + 6, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Restzeit-Bogen (weiß, schrumpft mit der Zeit)
+    ctx.strokeStyle = "rgba(255,255,255,0.85)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, r + 11, -Math.PI / 2, -Math.PI / 2 + lifeFrac * Math.PI * 2);
+    ctx.stroke();
+
+    // Glyph in der Mitte
+    ctx.fillStyle = "#0a0a0a";
+    ctx.font = "bold " + Math.round(r * 1.25) + "px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(type.glyph, 0, 1);
+
+    // Seiten-Badge: welche Seite wird getroffen?
+    const badge = type.side === "player" ? "DU" : type.side === "enemy" ? "CPU" : "BEIDE";
+    ctx.font = "bold 9px Arial";
+    const bw = ctx.measureText(badge).width + 8;
+    ctx.fillStyle = "rgba(0,0,0,0.75)";
+    roundRectPath(-bw / 2, r + 15, bw, 13, 6);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(badge, 0, r + 22);
+
+    ctx.restore();
+}
+
+function drawShockwaves(now) {
+    shockwaves = shockwaves.filter((s) => now - s.startAt < 600);
+
+    for (const s of shockwaves) {
+        const t = (now - s.startAt) / 600;
+        const r = 8 + t * 90;
+
+        ctx.save();
+        ctx.globalAlpha = 1 - t;
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = 4 * (1 - t) + 1;
+        withGlow(s.color, 20, () => {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+        ctx.restore();
+    }
+}
+
+/* ============================================================
+   EFFEKT-CHIPS: aktive Effekte mit Restzeit –
+   links = Spieler, Mitte = Ball, rechts = Gegner
+============================================================ */
+
+function chipText(e, now) {
+    const secs = Math.max(1, Math.ceil((e.endsAt - now) / 1000));
+    return e.type.glyph + " " + secs + "s";
+}
+
+function measureChip(e, now) {
+    ctx.font = "bold 11px Arial";
+    return ctx.measureText(chipText(e, now)).width + 16;
+}
+
+function drawChip(x, y, h, e, now) {
+    const w = measureChip(e, now);
+    const text = chipText(e, now);
+
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
+    ctx.strokeStyle = e.type.color;
+    ctx.lineWidth = 1.5;
+    roundRectPath(x, y, w, h, h / 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = e.type.color;
+    ctx.textAlign = "left";
+    ctx.fillText(text, x + 8, y + h / 2 + 1);
+
+    return x + w + 8;
+}
+
+function drawEffectChips(now) {
+    const groups = { player: [], ball: [], enemy: [] };
+    for (const e of activeEffects) {
+        if (groups[e.type.side]) groups[e.type.side].push(e);
+    }
+
+    ctx.save();
+    ctx.font = "bold 11px Arial";
+    ctx.textBaseline = "middle";
+
+    const y = 76;
+    const h = 20;
+
+    // Spieler: linksbündig ab 14px
+    let x = 14;
+    for (const e of groups.player) x = drawChip(x, y, h, e, now);
+
+    // Gegner: rechtsbündig bis canvas.width - 14
+    let xr = canvas.width - 14;
+    for (const e of groups.enemy) {
+        const w = measureChip(e, now);
+        xr = drawChip(xr - w, y, h, e, now) - w - 8;
+    }
+
+    // Ball: mittig
+    const ballWidths = groups.ball.map((e) => measureChip(e, now));
+    const totalW = ballWidths.reduce((a, b) => a + b + 8, -8);
+    let bx = (canvas.width - totalW) / 2;
+    for (const e of groups.ball) bx = drawChip(bx, y, h, e, now);
+
+    ctx.restore();
+}
+
+/* ============================================================
+   TOAST: große Ankündigung – WAS passiert + WEN es trifft
+============================================================ */
+
+function drawToast(now) {
+    if (!toast) return;
+
+    const t = (now - toast.startAt) / 2800;
+    if (t >= 1) {
+        toast = null;
+        return;
+    }
+
+    const type = toast.type;
+
+    // Pop-In am Anfang, Ausblenden am Ende
+    let scale = 1;
+    let alpha = 1;
+    if (t < 0.15) {
+        const k = t / 0.15;
+        scale = 0.6 + 0.4 * (1 + 2.7 * Math.pow(k - 1, 3) + 1.7 * Math.pow(k - 1, 2));
+        alpha = k;
+    } else if (t > 0.75) {
+        alpha = 1 - (t - 0.75) / 0.25;
+    }
+
+    const secs = (type.duration / 1000).toFixed(1).replace(".0", "");
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(canvas.width / 2, canvas.height * 0.32);
+    ctx.scale(scale, scale);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+
+    // Plakette
+    ctx.font = "bold 30px Arial";
+    const line1 = type.label;
+    const w1 = ctx.measureText(line1).width + 50;
+
+    ctx.font = "bold 15px Arial";
+    const line2 = sideLabelOf(type.side) + " · " + secs + "s";
+    const w2 = ctx.measureText(line2).width + 30;
+
+    const plaqueW = Math.max(w1, w2);
+    const plaqueH = 88;
+
+    withGlow(type.color, 35, () => {
+        ctx.fillStyle = "rgba(0,0,0,0.8)";
+        ctx.strokeStyle = type.color;
+        ctx.lineWidth = 2.5;
+        roundRectPath(-plaqueW / 2, -plaqueH / 2, plaqueW, plaqueH, 14);
+        ctx.fill();
+        ctx.stroke();
+    });
+
+    // Effekt-Name
+    ctx.font = "bold 30px Arial";
+    ctx.fillStyle = type.color;
+    ctx.shadowColor = type.color;
+    ctx.shadowBlur = 18;
+    ctx.fillText(line1, 0, -6);
+    ctx.shadowBlur = 0;
+
+    // Ziel-Seite + Dauer
+    ctx.font = "bold 15px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(line2, 0, 26);
+
+    // Glyph links in der Plakette
+    ctx.font = "22px Arial";
+    ctx.fillStyle = type.color;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    ctx.fillText(type.glyph, -plaqueW / 2 + 18, 0);
+
+    ctx.restore();
 }
 
 /* ============================================================
@@ -512,10 +979,8 @@ function gameLoop(now) {
 applyDifficulty();
 setActiveMode("normal");
 resetBallWithCountdown();
-spawnPowerUp();
 
-setInterval(() => {
-    if (!powerUpActive) spawnPowerUp();
-}, Math.random() * 5000 + 7000);
+// Erstes Power-Up nach 12-25 s, danach alle 24-42 s
+scheduleNextPowerUp(true);
 
 gameLoop();

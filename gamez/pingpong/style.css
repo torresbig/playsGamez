@@ -113,13 +113,15 @@ button:active {
     transform: translateY(-3px);
 }
 
-/* --- Control-Leiste unter dem Spielfeld --- */
+/* --- Control-Leiste unter dem Spielfeld:
+   Schwierigkeitsbuttons oben, Restart darunter --- */
 #controls {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
     margin-top: 16px;
     padding: 0 10px;
 }
@@ -129,11 +131,44 @@ button:active {
     gap: 12px;
 }
 
-.activeMode {
-    background: var(--main-color);
+/* --- Schwierigkeits-Buttons: jede mit ihrer EIGENEN Modusfarbe ---
+   --mode-color ist lokal pro Button gesetzt und ändert sich
+   NICHT beim Moduswechsel. Nur der aktive Button wird farbig
+   gefüllt; inaktive behalten dunklen Hintergrund + farbigen
+   Rahmen/Glow in ihrer eigenen Farbe. */
+#easyBtn   { --mode-color: #00ff88; } /* Grün   */
+#normalBtn { --mode-color: #00eaff; } /* Blau   */
+#hardBtn   { --mode-color: #ff0044; } /* Rot    */
+#ultraBtn  { --mode-color: #a200ff; } /* Lila  */
+
+#difficultyContainer button {
+    border-color: var(--mode-color);
+    box-shadow: 0 0 10px var(--mode-color);
+}
+
+/* Sterne der Schwierigkeiten IMMER weiß */
+#difficultyContainer button::before {
+    color: #ffffff;
+}
+
+#difficultyContainer button:hover,
+#difficultyContainer button:active {
+    background: var(--mode-color);
     color: black;
-    box-shadow: 0 0 20px var(--main-color);
+    box-shadow: 0 0 20px var(--mode-color);
     transform: translateY(-3px);
+}
+
+#difficultyContainer .activeMode {
+    background: var(--mode-color);
+    color: black;
+    box-shadow: 0 0 20px var(--mode-color);
+    transform: translateY(-3px);
+}
+
+/* Aktiver Schwierigkeits-Button: Stern bleibt weiß */
+#difficultyContainer .activeMode::before {
+    color: #ffffff;
 }
 
 /* --- Optischer Bonus-Titel (falls genutzt) --- */
