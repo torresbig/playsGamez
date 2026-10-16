@@ -1,0 +1,225 @@
+/* --- Grundlayout --- */
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #000000);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: white;
+}
+
+/* --- Animierter Hintergrund --- */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(0, 255, 255, 0.05) 0px,
+        rgba(0, 255, 255, 0.05) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    animation: moveGrid 12s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes moveGrid {
+    from { transform: translateY(0); }
+    to { transform: translateY(-200px); }
+}
+
+:root {
+    --main-color: #00eaff;
+}
+
+/* --- Hero / Logo --- */
+.hero {
+    text-align: center;
+    margin-top: 50px;
+    position: relative;
+    z-index: 1;
+}
+
+.logo {
+    width: 130px;
+    height: 130px;
+    filter: drop-shadow(0 0 15px var(--main-color));
+}
+
+.logo .ball {
+    animation: ballPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ballPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* --- Titel --- */
+#title {
+    margin: 20px 0 0;
+    font-size: 56px;
+    color: white;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px var(--main-color), 0 0 40px var(--main-color);
+}
+
+#title span {
+    color: var(--main-color);
+}
+
+.tagline {
+    margin: 10px 0 0;
+    font-size: 18px;
+    color: #9fd9e2;
+    letter-spacing: 1px;
+}
+
+/* --- Spielliste --- */
+.games {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin: 60px auto;
+    padding: 0 20px;
+    max-width: 900px;
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Spielkarte --- */
+.game-card {
+    width: 340px;
+    background: #111;
+    border: 2px solid var(--main-color);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: white;
+    transition: 0.25s;
+    box-shadow: 0 0 15px rgba(0, 234, 255, 0.35);
+    display: block;
+}
+
+a.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px var(--main-color);
+}
+
+/* --- Mini-Vorschau auf das Spielfeld --- */
+.game-thumb {
+    position: relative;
+    height: 160px;
+    background: #0f0f0f;
+    border-bottom: 2px solid rgba(0, 234, 255, 0.4);
+    overflow: hidden;
+}
+
+.paddle {
+    position: absolute;
+    width: 8px;
+    height: 40px;
+    border-radius: 4px;
+    background: var(--main-color);
+    box-shadow: 0 0 10px var(--main-color);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.paddle-left { left: 25px; }
+.paddle-right { right: 25px; }
+
+.mini-ball {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--main-color);
+    box-shadow: 0 0 10px var(--main-color);
+    top: 50%;
+    left: 50%;
+    animation: ballMove 2.5s linear infinite;
+}
+
+@keyframes ballMove {
+    0%   { top: 50%; left: 50%; }
+    25%  { top: 20%; left: 26%; }
+    50%  { top: 50%; left: 50%; }
+    75%  { top: 78%; left: 74%; }
+    100% { top: 50%; left: 50%; }
+}
+
+.question-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 64px;
+    color: var(--main-color);
+    text-shadow: 0 0 20px var(--main-color);
+    opacity: 0.6;
+}
+
+/* --- Kartentexte --- */
+.game-info {
+    padding: 20px;
+}
+
+.game-info h2 {
+    margin: 0 0 10px;
+    font-size: 26px;
+    color: var(--main-color);
+    letter-spacing: 1px;
+}
+
+.game-info p {
+    margin: 0 0 18px;
+    font-size: 15px;
+    color: #cfd8dc;
+    line-height: 1.5;
+}
+
+.play-btn {
+    display: inline-block;
+    background: #111;
+    color: white;
+    border: 2px solid var(--main-color);
+    padding: 8px 18px;
+    font-size: 16px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 234, 255, 0.35);
+    transition: 0.25s;
+}
+
+a.game-card:hover .play-btn {
+    background: var(--main-color);
+    color: black;
+    box-shadow: 0 0 20px var(--main-color);
+}
+
+/* --- Kommende Spiele (nicht klickbar) --- */
+.coming-soon {
+    border-color: rgba(0, 234, 255, 0.35);
+    box-shadow: none;
+    opacity: 0.65;
+}
+
+.play-btn.disabled {
+    border-color: rgba(0, 234, 255, 0.35);
+    box-shadow: none;
+    color: #9fd9e2;
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #607d8b;
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+}

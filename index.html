@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaysGamez – Arcade Games</title>
+    <link rel="stylesheet" href="styles/style_main.css">
+</head>
+
+<body>
+
+    <!-- --- Logo + Titel --- -->
+    <header class="hero">
+        <svg class="logo" viewBox="0 0 120 120" role="img" aria-label="PlaysGamez Logo">
+            <!-- Rahmen -->
+            <rect x="6" y="6" width="108" height="108" rx="24"
+                  fill="#0f0f0f" stroke="var(--main-color)" stroke-width="4" />
+            <!-- Mittellinie wie beim Pong-Spielfeld -->
+            <line x1="60" y1="20" x2="60" y2="100"
+                  stroke="var(--main-color)" stroke-width="4" stroke-dasharray="6 9" opacity="0.6" />
+            <!-- linker Schläger -->
+            <rect x="20" y="38" width="9" height="34" rx="4.5" fill="var(--main-color)" />
+            <!-- rechter Schläger -->
+            <rect x="91" y="50" width="9" height="34" rx="4.5" fill="var(--main-color)" />
+            <!-- Ball -->
+            <circle class="ball" cx="60" cy="56" r="7" fill="var(--main-color)" />
+        </svg>
+
+        <h1 id="title">Plays<span>Gamez</span></h1>
+        <p class="tagline">Retro-Arcade-Games direkt im Browser spielen</p>
+    </header>
+
+    <!-- --- Spielliste --- -->
+    <main>
+        <section class="games">
+
+            <a class="game-card" href="gamez/pingpong/index.html">
+                <div class="game-thumb">
+                    <span class="paddle paddle-left"></span>
+                    <span class="mini-ball"></span>
+                    <span class="paddle paddle-right"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Ping Pong</h2>
+                    <p>Das klassische Pong-Duell gegen die KI – mit drei Schwierigkeitsgraden.</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <div class="game-card coming-soon">
+                <div class="game-thumb">
+                    <span class="question-mark">?</span>
+                </div>
+                <div class="game-info">
+                    <h2>Bald verfügbar</h2>
+                    <p>Weitere Spiele sind bereits in Arbeit – bleib dran!</p>
+                    <span class="play-btn disabled">▶ Kommt bald</span>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 PlaysGamez – Spiel. Gewinn. Wiederholen. by TulixPro</p>
+    </footer>
+
+</body>
