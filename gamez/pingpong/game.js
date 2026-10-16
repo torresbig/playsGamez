@@ -163,46 +163,63 @@ document.addEventListener("keyup", (e) => {
 });
 
 /* ============================================================
-   MAUS-STEUERUNG
+   STEUERUNG (gemeinsame Logik)
+
+   Das Canvas wird per CSS skaliert (Desktop groß, Handy klein),
+   die interne Auflösung bleibt 800x500. Deshalb müssen alle
+   Eingabe-Koordinaten von CSS-Pixeln in Canvas-Pixel umgerechnet
+   werden – sonst erreicht das Paddle den unteren/oberen Rand
+   nie (das war der alte Bug).
+
+   Maus UND Finger positionieren das Paddle direkt 1:1:
+   - Maus: sofortige Reaktion beim Hovern (kein Klick nötig)
+   - Touch: Paddle folgt dem Finger pixelgenau und sofort
 ============================================================ */
 
-let mouseDown = false;
+function movePaddleToClientY(clientY) {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.height === 0) return;
 
-canvas.addEventListener("mousedown", () => {
-    mouseDown = true;
-});
+    const scaleY = canvas.height / rect.height;
+    const canvasY = (clientY - rect.top) * scaleY;
 
-canvas.addEventListener("mouseup", () => {
-    mouseDown = false;
-});
+    paddleY = canvasY - paddleHeight / 2;
+
+    if (paddleY < 0) paddleY = 0;
+    if (paddleY > canvas.height - paddleHeight) paddleY = canvas.height - paddleHeight;
+}
 
 canvas.addEventListener("mousemove", (e) => {
-    if (mouseDown) {
-        const rect = canvas.getBoundingClientRect();
-        const mouseY = e.clientY - rect.top;
-        paddleY = mouseY - paddleHeight / 2;
-    }
+    movePaddleToClientY(e.clientY);
 });
 
 /* ============================================================
    TOUCH-STEUERUNG
+   Das Paddle folgt dem Finger 1:1 und SOFORT (kein trödelndes
+   +/- pro Frame). Wichtig: touch-action: none im CSS +
+   preventDefault, damit die Seite beim Spielen nicht scrollt.
 ============================================================ */
 
+function handleTouches(e) {
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    movePaddleToClientY(touch.clientY);
+}
+
 canvas.addEventListener("touchstart", (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const touchY = e.touches[0].clientY - rect.top;
+    e.preventDefault();
+    handleTouches(e);
+}, { passive: false });
 
-    if (touchY < paddleY + paddleHeight / 2) {
-        upPressed = true;
-    } else {
-        downPressed = true;
-    }
-});
+canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    handleTouches(e);
+}, { passive: false });
 
-canvas.addEventListener("touchend", () => {
-    upPressed = false;
-    downPressed = false;
-});
+canvas.addEventListener("touchend", (e) => {
+    e.preventDefault();
+}, { passive: false });
 
 /* ============================================================
    POWER-UP LOGIK

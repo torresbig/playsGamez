@@ -1,6 +1,28 @@
-/* --- Grundlayout --- */
+/* ============================================================
+   PlaysGamez – Pong Stylesheet
+   Layout: responsive (Desktop groß, Handy angepasst)
+============================================================ */
+
+:root {
+    --main-color: #00eaff;
+    transition: all 0.4s ease;
+    /* Platz für Titel + Buttons, den das Spielfeld nicht belegt */
+    --reserved-space: 190px;
+}
+
+body, h1, button, #gameCanvas {
+    transition: all 0.4s ease;
+}
+
+/* --- Grundlayout: Spalte, zentriert, kein Scrollen nötig --- */
 body {
     margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #000000);
     font-family: 'Segoe UI', Arial, sans-serif;
     color: white;
@@ -31,135 +53,40 @@ body::before {
     to { transform: translateY(-200px); }
 }
 
-:root {
-    --main-color: #00eaff;
-    transition: all 0.4s ease;
-}
-
-body, h1, button, #gameCanvas {
-    transition: all 0.4s ease;
-}
-
-
 /* --- Titel --- */
 #title {
     text-align: center;
-    margin-top: 20px;
-    font-size: 48px;
-    color: #00eaff;
-    text-shadow: 0 0 20px #00eaff, 0 0 40px #00eaff;
-    letter-spacing: 2px;
-}
-
-/* --- Spielfeld --- */
-#gameCanvas {
-    display: block;
-    margin: 40px auto;
-    border: 3px solid #00eaff55;
-    box-shadow: 0 0 25px #00eaffaa, inset 0 0 20px #003344;
-    background: #0f0f0f;
-    border-radius: 10px;
-}
-
-/* --- Buttons allgemein --- */
-button {
-    background: #111;
-    color: white;
-    border: 2px solid #00eaff;
-    padding: 12px 24px;
-    font-size: 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.25s;
-    box-shadow: 0 0 10px #00eaff55;
-}
-
-button:hover {
-    background: #00eaff;
-    color: black;
-    box-shadow: 0 0 20px #00eaff;
-    transform: translateY(-3px);
-}
-
-/* --- Restart Button links --- */
-#restartBtn {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-}
-
-/* --- Difficulty Buttons rechts nebeneinander --- */
-#difficultyContainer {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    gap: 12px;
-}
-
-/* --- Kleine Arcade-Icons für Buttons --- */
-button::before {
-    content: "★ ";
-    color: #00eaff;
-}
-
-:root {
-    --main-color: #00eaff;
-}
-
-/* Hintergrund */
-body {
-    margin: 0;
-    background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #000000);
-    font-family: 'Segoe UI', Arial, sans-serif;
-    color: white;
-    overflow: hidden;
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        45deg,
-        rgba(0, 255, 255, 0.05) 0px,
-        rgba(0, 255, 255, 0.05) 2px,
-        transparent 2px,
-        transparent 6px
-    );
-    animation: moveGrid 12s linear infinite;
-    pointer-events: none;
-}
-
-@keyframes moveGrid {
-    from { transform: translateY(0); }
-    to { transform: translateY(-200px); }
-}
-
-/* Titel */
-#title {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 48px;
+    margin: 16px 0 12px;
+    font-size: clamp(24px, 4.5vw, 48px);
     color: var(--main-color);
     text-shadow: 0 0 20px var(--main-color), 0 0 40px var(--main-color);
     letter-spacing: 2px;
+    line-height: 1;
 }
 
-/* Canvas */
+/* --- Spielfeld: responsive ---
+   Interne Auflösung bleibt 800x500 (16:10).
+   - nie breiter als 1200px (Desktop = schön groß)
+   - nie breiter als 95vw (Handy)
+   - nie zu hoch für den Bildschirm: --reserved-space wird
+     abgezogen, damit Titel + Buttons mit aufs Display passen */
 #gameCanvas {
     display: block;
-    margin: 40px auto;
     border: 3px solid var(--main-color);
     box-shadow: 0 0 25px var(--main-color), inset 0 0 20px #003344;
     background: #0f0f0f;
     border-radius: 10px;
+    margin: 0 auto;
+    width: min(1200px, 95vw, calc((100vh - var(--reserved-space)) * 1.6));
+    width: min(1200px, 95vw, calc((100dvh - var(--reserved-space)) * 1.6));
+    height: auto;
+    /* Maus/Touch 1:1, kein Scroll-/Zoom-Geste beim Spielen */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
-/* Buttons */
+/* --- Buttons allgemein --- */
 button {
     background: #111;
     color: white;
@@ -170,29 +97,7 @@ button {
     cursor: pointer;
     transition: 0.25s;
     box-shadow: 0 0 10px var(--main-color);
-}
-
-button:hover {
-    background: var(--main-color);
-    color: black;
-    box-shadow: 0 0 20px var(--main-color);
-    transform: translateY(-3px);
-}
-
-/* Restart links */
-#restartBtn {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-}
-
-/* Difficulty rechts */
-#difficultyContainer {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    gap: 12px;
+    font-family: inherit;
 }
 
 button::before {
@@ -200,7 +105,29 @@ button::before {
     color: var(--main-color);
 }
 
+button:hover,
+button:active {
+    background: var(--main-color);
+    color: black;
+    box-shadow: 0 0 20px var(--main-color);
+    transform: translateY(-3px);
+}
 
+/* --- Control-Leiste unter dem Spielfeld --- */
+#controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 0 10px;
+}
+
+#difficultyContainer {
+    display: flex;
+    gap: 12px;
+}
 
 .activeMode {
     background: var(--main-color);
@@ -209,6 +136,7 @@ button::before {
     transform: translateY(-3px);
 }
 
+/* --- Optischer Bonus-Titel (falls genutzt) --- */
 .rgb-title {
     font-size: 70px;
     font-weight: bold;
@@ -228,15 +156,52 @@ button::before {
     100% { color: #9400d3; text-shadow: 0 0 20px #9400d3; }
 }
 
-#gameCanvas {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+/* ============================================================
+   HANDY / TABLET
+============================================================ */
+
+@media (max-width: 640px) {
+    :root {
+        --reserved-space: 165px;
+    }
+
+    #title {
+        margin: 10px 0 8px;
+    }
+
+    #gameCanvas {
+        width: min(95vw, calc((100vh - var(--reserved-space)) * 1.6));
+        border-width: 2px;
+        border-radius: 8px;
+    }
+
+    #controls {
+        margin-top: 12px;
+        gap: 8px;
+    }
+
+    #difficultyContainer {
+        gap: 8px;
+    }
+
+    button {
+        padding: 10px 14px;
+        font-size: 15px;
+        border-radius: 8px;
+    }
 }
 
-button {
-    padding: 15px 25px;
-    font-size: 20px;
+/* Sehr kurze Displays (z.B. Handy quer): mehr Platz fürs Feld */
+@media (max-height: 480px) {
+    :root {
+        --reserved-space: 80px;
+    }
+
+    #title {
+        margin: 6px 0;
+    }
+
+    #controls {
+        margin-top: 8px;
+    }
 }
