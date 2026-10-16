@@ -58,6 +58,14 @@ const DIFFICULTY = {
         enemySpeed: 4.4,
         color: "#ff0044" // Rot
     }
+    ,
+    ultra: {
+        ballSpeed: 9,
+        ballSpeedGain: 0.3,
+        maxBallSpeed: 15,
+        enemySpeed: 5.5,
+        color: "#a200ff" // Rot
+    }
 };
 
 /* ============================================================
@@ -117,7 +125,7 @@ function setActiveMode(mode) {
     document.getElementById("easyBtn").classList.remove("activeMode");
     document.getElementById("normalBtn").classList.remove("activeMode");
     document.getElementById("hardBtn").classList.remove("activeMode");
-
+    document.getElementById("ultraBtn").classList.remove("activeMode");
     document.getElementById(mode + "Btn").classList.add("activeMode");
 }
 
@@ -139,6 +147,12 @@ document.getElementById("hardBtn").addEventListener("click", () => {
     difficulty = "hard";
     applyDifficulty();
     setActiveMode("hard");
+    resetBallWithCountdown();
+});
+document.getElementById("ultraBtn").addEventListener("click", () => {
+    difficulty = "ultra";
+    applyDifficulty();
+    setActiveMode("ultra");
     resetBallWithCountdown();
 });
 
