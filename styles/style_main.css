@@ -164,6 +164,190 @@ a.game-card:hover {
     opacity: 0.6;
 }
 
+/* --- Tetris-Vorschau: bunter Stapel + fallendes T-Stück --- */
+.tetris-thumb .tm-stack {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+}
+
+.tetris-thumb .tm-col {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 3px;
+}
+
+.tm-c {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.tm-cyan   { color: #00eaff; }
+.tm-yellow { color: #ffd500; }
+.tm-green  { color: #00ff88; }
+.tm-red    { color: #ff0044; }
+.tm-purple { color: #a200ff; }
+.tm-orange { color: #ff9500; }
+.tm-blue   { color: #2d6bff; }
+
+/* fallendes T-Stück (4 Zellen im 3x2-Raster) */
+.tetris-thumb .tm-fall {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: tmFall 2.4s ease-in infinite;
+}
+
+.tm-piece {
+    display: grid;
+    grid-template-columns: repeat(3, 18px);
+    grid-auto-rows: 18px;
+    gap: 3px;
+}
+
+.tm-piece .tm-c:nth-child(1) { grid-area: 1 / 2; }
+.tm-piece .tm-c:nth-child(2) { grid-area: 2 / 1; }
+.tm-piece .tm-c:nth-child(3) { grid-area: 2 / 2; }
+.tm-piece .tm-c:nth-child(4) { grid-area: 2 / 3; }
+
+@keyframes tmFall {
+    0%   { transform: translate(-50%, 0); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translate(-50%, 96px); opacity: 0; }
+}
+
+/* --- Neon-Racer-Vorschau: Straße mit laufenden Mittellinien --- */
+.race-thumb {
+    background: #08080d;
+}
+
+.rm-road {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 150px;
+    transform: translateX(-50%);
+    background: #17171d;
+    border-left: 2px solid rgba(0, 234, 255, 0.5);
+    border-right: 2px solid rgba(0, 234, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 234, 255, 0.25);
+}
+
+.rm-dashes {
+    position: absolute;
+    top: -52px;
+    bottom: -52px;
+    left: 50%;
+    width: 4px;
+    margin-left: -2px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #9fd9e2 0 26px,
+        transparent 26px 52px
+    );
+    opacity: 0.6;
+    animation: rmDash 0.7s linear infinite;
+}
+
+@keyframes rmDash {
+    to { transform: translateY(52px); }
+}
+
+.rm-car {
+    position: absolute;
+    left: 50%;
+    width: 20px;
+    height: 34px;
+    border-radius: 5px;
+    background: currentColor;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.rm-player {
+    bottom: 14px;
+    margin-left: -44px;
+    color: #00eaff;
+}
+
+.rm-traffic {
+    top: 14px;
+    margin-left: 12px;
+    color: #ff9500;
+    animation: rmApproach 1.8s linear infinite;
+}
+
+@keyframes rmApproach {
+    0%   { transform: translateY(0); opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateY(70px); opacity: 0; }
+}
+
+/* --- Neon-Blaster-Vorschau: Schiff, Schuss & Gegner --- */
+.shooter-thumb {
+    background: #06060c;
+}
+
+.sm-ship {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 26px solid #00eaff;
+    filter: drop-shadow(0 0 8px #00eaff);
+}
+
+.sm-bolt {
+    position: absolute;
+    bottom: 44px;
+    left: 50%;
+    width: 4px;
+    height: 14px;
+    margin-left: -2px;
+    background: #00eaff;
+    box-shadow: 0 0 8px #00eaff;
+    animation: smShoot 0.9s linear infinite;
+}
+
+@keyframes smShoot {
+    0%   { transform: translateY(0); opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(-86px); opacity: 0; }
+}
+
+.sm-enemy {
+    position: absolute;
+    top: 22px;
+    width: 20px;
+    height: 20px;
+    background: #00ff88;
+    box-shadow: 0 0 10px #00ff88;
+    transform: rotate(45deg);
+    animation: smBob 2s ease-in-out infinite;
+}
+
+.sm-e1 { left: 70px; }
+.sm-e2 { right: 70px; animation-delay: -1s; background: #ff9500; box-shadow: 0 0 10px #ff9500; }
+
+@keyframes smBob {
+    0%, 100% { margin-top: 0; }
+    50% { margin-top: 8px; }
+}
+
 /* --- Kartentexte --- */
 .game-info {
     padding: 20px;

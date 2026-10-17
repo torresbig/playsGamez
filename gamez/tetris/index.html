@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaysGamez – Tetris</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1 id="title">PlaysGamez</h1>
+
+    <canvas id="gameCanvas" width="560" height="720"></canvas>
+
+    <div id="controls">
+        <button id="pauseBtn">Pause</button>
+        <button id="restartBtn">Restart</button>
+    </div>
+
+    <!-- Touch-Steuerung (nur auf kleinen Displays / Touch-Geräten sichtbar) -->
+    <div id="touchControls">
+        <button data-action="left" aria-label="Nach links">◀</button>
+        <button data-action="rotate" aria-label="Stein drehen">⟳</button>
+        <button data-action="right" aria-label="Nach rechts">▶</button>
+        <button data-action="hold" aria-label="Stein zurücklegen">Hold</button>
+        <button data-action="down" aria-label="Schneller fallen">▼</button>
+        <button data-action="drop" aria-label="Sofort fallen">⤓</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaysGamez – Neon Racer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1 id="title">PlaysGamez</h1>
+
+    <canvas id="gameCanvas" width="540" height="760"></canvas>
+
+    <p id="hint">← → Steuern · ↑ Nitro · ↓ Bremse · P Pause · R Neustart</p>
+
+    <div id="controls">
+        <button id="pauseBtn">Pause</button>
+        <button id="restartBtn">Restart</button>
+    </div>
+
+    <!-- Touch-Steuerung (nur auf kleinen Displays / Touch-Geräten sichtbar) -->
+    <div id="touchControls">
+        <button data-action="left" aria-label="Nach links">◀</button>
+        <button data-action="boost" aria-label="Nitro">⚡ Nitro</button>
+        <button data-action="right" aria-label="Nach rechts">▶</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

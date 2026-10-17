@@ -1,0 +1,208 @@
+/* ============================================================
+   PlaysGamez – Tetris Stylesheet
+   Layout: responsive (Desktop groß, Handy angepasst)
+============================================================ */
+
+:root {
+    --main-color: #00eaff;
+    transition: all 0.4s ease;
+    /* Platz für Titel + Buttons, den das Spielfeld nicht belegt */
+    --reserved-space: 200px;
+}
+
+body, h1, button, #gameCanvas {
+    transition: all 0.4s ease;
+}
+
+/* --- Grundlayout: Spalte, zentriert, kein Scrollen nötig --- */
+body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #000000);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: white;
+    overflow: hidden;
+}
+
+/* --- Animierter Hintergrund --- */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(0, 255, 255, 0.05) 0px,
+        rgba(0, 255, 255, 0.05) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    animation: moveGrid 12s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes moveGrid {
+    from { transform: translateY(0); }
+    to { transform: translateY(-200px); }
+}
+
+/* --- Titel --- */
+#title {
+    text-align: center;
+    margin: 14px 0 10px;
+    font-size: clamp(22px, 4vw, 40px);
+    color: var(--main-color);
+    text-shadow: 0 0 20px var(--main-color), 0 0 40px var(--main-color);
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+/* --- Spielfeld: responsive ---
+   Interne Auflösung bleibt 560x720 (Hochformat, 0.7778).
+   - nie breiter als 560px
+   - nie breiter als 95vw (Handy)
+   - nie zu hoch für den Bildschirm: --reserved-space wird
+     abgezogen, damit Titel + Buttons mit aufs Display passen */
+#gameCanvas {
+    display: block;
+    border: 3px solid var(--main-color);
+    box-shadow: 0 0 25px var(--main-color), inset 0 0 20px #003344;
+    background: #0d0d12;
+    border-radius: 10px;
+    margin: 0 auto;
+    width: min(560px, 95vw, calc((100vh - var(--reserved-space)) * 0.7778));
+    width: min(560px, 95vw, calc((100dvh - var(--reserved-space)) * 0.7778));
+    height: auto;
+    /* kein Scroll-/Zoom-Geste beim Spielen */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* --- Buttons allgemein --- */
+button {
+    background: #111;
+    color: white;
+    border: 2px solid var(--mode-color, var(--main-color));
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 0 10px var(--mode-color, var(--main-color));
+    font-family: inherit;
+}
+
+button::before {
+    content: "★ ";
+    color: #ffffff;
+}
+
+button:hover,
+button:active {
+    background: var(--mode-color, var(--main-color));
+    color: black;
+    box-shadow: 0 0 20px var(--mode-color, var(--main-color));
+    transform: translateY(-3px);
+}
+
+/* --- Control-Leiste unter dem Spielfeld --- */
+#controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 0 10px;
+}
+
+/* Jeder Button hat seine eigene Akzentfarbe */
+#pauseBtn   { --mode-color: #ffd500; } /* Gelb */
+#restartBtn { --mode-color: #ff0044; } /* Rot  */
+
+/* --- Touch-Steuerung: nur auf kleinen Displays / Touch-Geräten --- */
+#touchControls {
+    display: none;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    width: min(560px, 95vw);
+    margin-top: 12px;
+}
+
+#touchControls button {
+    padding: 14px 0;
+    font-size: 20px;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Kein Sternchen vor den Touch-Symbolen */
+#touchControls button::before {
+    content: "";
+}
+
+@media (max-width: 640px), (hover: none) {
+    #touchControls {
+        display: grid;
+    }
+}
+
+/* ============================================================
+   HANDY / TABLET
+============================================================ */
+
+@media (max-width: 640px) {
+    :root {
+        --reserved-space: 250px;
+    }
+
+    #title {
+        margin: 10px 0 8px;
+    }
+
+    #gameCanvas {
+        width: min(95vw, calc((100vh - var(--reserved-space)) * 0.7778));
+        border-width: 2px;
+        border-radius: 8px;
+    }
+
+    #controls {
+        margin-top: 10px;
+        gap: 8px;
+    }
+
+    button {
+        padding: 10px 14px;
+        font-size: 15px;
+        border-radius: 8px;
+    }
+}
+
+/* Sehr kurze Displays (z.B. Handy quer): mehr Platz fürs Feld */
+@media (max-height: 480px) {
+    :root {
+        --reserved-space: 130px;
+    }
+
+    #title {
+        margin: 6px 0;
+    }
+
+    #controls {
+        margin-top: 8px;
+    }
+
+    /* Auf flachen Displays darf die Seite leicht scrollen,
+       damit die Touch-Buttons erreichbar bleiben */
+    body {
+        overflow: auto;
+    }
+}
