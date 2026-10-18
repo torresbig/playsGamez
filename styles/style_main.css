@@ -33,6 +33,7 @@ body::before {
 
 :root {
     --main-color: #00eaff;
+    --secondary-color: #ff0000;
 }
 
 /* --- Hero / Logo --- */
@@ -96,6 +97,18 @@ body::before {
     width: 340px;
     background: #111;
     border: 2px solid var(--main-color);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: white;
+    transition: 0.25s;
+    box-shadow: 0 0 15px rgba(0, 234, 255, 0.35);
+    display: block;
+}
+.game-card2 {
+    width: 340px;
+    background: #111;
+    border: 2px solid var(--secondary-color);
     border-radius: 10px;
     overflow: hidden;
     text-decoration: none;
@@ -357,6 +370,13 @@ a.game-card:hover {
     margin: 0 0 10px;
     font-size: 26px;
     color: var(--main-color);
+    letter-spacing: 1px;
+}
+
+.game-info h21 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: var(--secondary-color);
     letter-spacing: 1px;
 }
 
