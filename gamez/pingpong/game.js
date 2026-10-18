@@ -81,17 +81,17 @@ const DIFFICULTY = {
 
 const POWERUP_TYPES = [
     // Verkleinern = klein & rot, Vergrößern = groß & grün
-    { id: "shrinkEnemy",  label: "GEGNER SCHRUMPFEN",     glyph: "▼", color: "#ff2d55", radius: 11, side: "enemy",  weight: 3,   duration: 6000 },
-    { id: "growPlayer",   label: "DU WIRST RIESIG",       glyph: "▲", color: "#00ff88", radius: 18, side: "player", weight: 3,   duration: 6000 },
-    { id: "shrinkPlayer", label: "DU SCHRUMPST!",         glyph: "▼", color: "#ff2d55", radius: 11, side: "player", weight: 1.5, duration: 6000 },
-    { id: "growEnemy",    label: "GEGNER WIRD RIESIG",    glyph: "▲", color: "#00ff88", radius: 18, side: "enemy",  weight: 1.5, duration: 6000 },
+    { id: "shrinkEnemy",  label: "GEGNER SCHRUMPFEN",     glyph: "▼", color: "#ff2d55", radius: 11, side: "enemy",  weight: 3,   duration: 6000, positive: false },
+    { id: "growPlayer",   label: "DU WIRST RIESIG",       glyph: "▲", color: "#00ff88", radius: 18, side: "player", weight: 3,   duration: 6000, positive: true },
+    { id: "shrinkPlayer", label: "DU SCHRUMPST!",         glyph: "▼", color: "#ff2d55", radius: 11, side: "player", weight: 1.5, duration: 6000, positive: false },
+    { id: "growEnemy",    label: "GEGNER WIRD RIESIG",    glyph: "▲", color: "#00ff88", radius: 18, side: "enemy",  weight: 1.5, duration: 6000, positive: false },
     // Special Events
-    { id: "invertPlayer", label: "STEUERUNG INVERTIERT!", glyph: "⇅", color: "#ff9500", radius: 14, side: "player", weight: 1.5, duration: 5000 },
-    { id: "confuseEnemy", label: "GEGNER IST VERWIRRT!",  glyph: "?",  color: "#ff2dd4", radius: 14, side: "enemy",  weight: 2.5, duration: 6000 },
-    { id: "curve",        label: "KURVENBALL!",           glyph: "~",  color: "#ffe600", radius: 14, side: "ball",   weight: 3,   duration: 6000 },
-    { id: "bigBall",      label: "RIESEN-BALL!",          glyph: "●",  color: "#00eaff", radius: 15, side: "ball",   weight: 2.5, duration: 7000 },
-    { id: "freezeEnemy",  label: "GEGNER EINGEFROREN!",   glyph: "❄",  color: "#7df9ff", radius: 13, side: "enemy",  weight: 2.5, duration: 2500 },
-    { id: "turboPlayer",  label: "TURBO-AKTIV!",          glyph: "⚡", color: "#ff9500", radius: 14, side: "player", weight: 2.5, duration: 6000 }
+    { id: "invertPlayer", label: "STEUERUNG INVERTIERT!", glyph: "⇅", color: "#ff9500", radius: 14, side: "player", weight: 1.5, duration: 5000, positive: false },
+    { id: "confuseEnemy", label: "GEGNER IST VERWIRRT!",  glyph: "?",  color: "#ff2dd4", radius: 14, side: "enemy",  weight: 2.5, duration: 6000, positive: false },
+    { id: "curve",        label: "KURVENBALL!",           glyph: "~",  color: "#ffe600", radius: 14, side: "ball",   weight: 3,   duration: 6000, positive: true },
+    { id: "bigBall",      label: "RIESEN-BALL!",          glyph: "●",  color: "#00eaff", radius: 15, side: "ball",   weight: 2.5, duration: 7000, positive: true },
+    { id: "freezeEnemy",  label: "GEGNER EINGEFROREN!",   glyph: "❄",  color: "#7df9ff", radius: 13, side: "enemy",  weight: 2.5, duration: 2500, positive: false },
+    { id: "turboPlayer",  label: "TURBO-AKTIV!",          glyph: "⚡", color: "#ff9500", radius: 14, side: "player", weight: 2.5, duration: 6000, positive: true }
 ];
 
 // Aktuelles Token auf dem Feld
@@ -138,6 +138,22 @@ let downPressed = false;
 let gameStarted = false;
 let countdown = 3;
 let countdownInterval = null; // verhindert gestapelte Countdown-Timer
+
+/* ============================================================
+   ORIENTATION (HANDY)
+
+   Erzwingt das Querformat, sofern der Browser das unterstützt.
+   Wird einmal beim Spielstart aufgerufen. Ein gescheitertes Lock
+   ist nicht kritisch – das Spiel läuft dann einfach weiter.
+============================================================ */
+
+function lockLandscape() {
+    if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        screen.orientation.lock('landscape').catch(() => {
+            // Lock nicht verfügbar oder vom Nutzer verweigert – ignorieren
+        });
+    }
+}
 
 /* ============================================================
    MODUSWECHSEL (CLEAN COLOR SWITCH)
@@ -229,15 +245,26 @@ document.addEventListener("keyup", (e) => {
 
    Maus UND Finger positionieren das Paddle direkt 1:1:
    - Maus: sofortige Reaktion beim Hovern (kein Klick nötig)
-   - Touch: Paddle folgt dem Finger pixelgenau und sofort
+   - Touch: Paddle folgt dem Finger pixelgenau und sofort,
+     liegt aber mit PADDLE_TOUCH_OFFSET oberhalb des Fingers,
+     damit der Finger das Paddle nicht verdeckt.
 ============================================================ */
 
-function movePaddleToClientY(clientY) {
+// Beim Touch sitzt das Paddle so viele Canvas-Pixel über dem Finger,
+// sodass der eigene Finger das Paddle nicht mehr verdeckt.
+const PADDLE_TOUCH_OFFSET = 45;
+
+function movePaddleToClientY(clientY, isTouch = false) {
     const rect = canvas.getBoundingClientRect();
     if (rect.height === 0) return;
 
     const scaleY = canvas.height / rect.height;
     let canvasY = (clientY - rect.top) * scaleY;
+
+    if (isTouch) {
+        // Paddle oberhalb des Fingers platzieren (Finger bleibt sichtbar)
+        canvasY -= PADDLE_TOUCH_OFFSET;
+    }
 
     // Steuerung invertiert (Power-Up): Position spiegeln
     if (invertActive) canvasY = canvas.height - canvasY;
@@ -263,7 +290,7 @@ function handleTouches(e) {
     const touch = e.touches[0];
     if (!touch) return;
 
-    movePaddleToClientY(touch.clientY);
+    movePaddleToClientY(touch.clientY, true);
 }
 
 canvas.addEventListener("touchstart", (e) => {
@@ -340,9 +367,25 @@ function collectPowerUp() {
     powerUpActive = false;
     powerUpType = null;
 
+    // Wer hat den Ball zuletzt berührt? Das ist der Sammler.
+    const hitter = lastHit || "player";
+
+    // Zielseite bestimmen:
+    // - positive Effekte  -> treffen den Sammler
+    // - negative Effekte  -> treffen den Gegner
+    // - Ball-Effekte (kurve, großer Ball) sind neutral
+    let target;
+    if (type.side === "ball") {
+        target = "ball";
+    } else if (type.positive) {
+        target = hitter;
+    } else {
+        target = hitter === "player" ? "enemy" : "player";
+    }
+
     // Effekt aktivieren (kein Stapeln desselben Typs)
     activeEffects = activeEffects.filter((e) => e.type.id !== type.id);
-    const effect = { type, endsAt: performance.now() + type.duration };
+    const effect = { type, endsAt: performance.now() + type.duration, target };
     if (type.id === "curve") effect.curveSpin = Math.random() > 0.5 ? 1 : -1;
     activeEffects.push(effect);
 
@@ -352,7 +395,7 @@ function collectPowerUp() {
     recomputeEffects();
 
     // Anzeige: was passiert + betroffene Seite
-    toast = { type, startAt: performance.now() };
+    toast = { type, target, startAt: performance.now() };
 }
 
 function hasEffect(id) {
@@ -369,6 +412,7 @@ function recomputeEffects() {
     paddleHeight = 100;
     enemyHeight = 100;
     playerSpeed = 5;
+    enemySpeed = DIFFICULTY[difficulty].enemySpeed;
     ballSize = 10;
     enemyFrozen = false;
     enemyConfused = false;
@@ -376,17 +420,29 @@ function recomputeEffects() {
     curveActive = false;
     curveSpin = 0;
 
-    // Aus Effekten ableiten
-    if (hasEffect("growPlayer")) paddleHeight = 150;
-    if (hasEffect("shrinkPlayer")) paddleHeight = 55;
-    if (hasEffect("growEnemy")) enemyHeight = 150;
-    if (hasEffect("shrinkEnemy")) enemyHeight = 55;
-    if (hasEffect("turboPlayer")) playerSpeed = 8.5;
-    if (hasEffect("bigBall")) ballSize = 22;
+    // Aus Effekten ableiten – e.target legt fest, welcher Paddle / KI betroffen ist
+    for (const e of activeEffects) {
+        const isPlayer = e.target === "player";
+        const isEnemy = e.target === "enemy";
 
-    enemyFrozen = hasEffect("freezeEnemy");
-    enemyConfused = hasEffect("confuseEnemy");
-    invertActive = hasEffect("invertPlayer");
+        if (e.type.id === "growPlayer" || e.type.id === "growEnemy") {
+            if (isPlayer) paddleHeight = 150;
+            if (isEnemy) enemyHeight = 150;
+        }
+        if (e.type.id === "shrinkPlayer" || e.type.id === "shrinkEnemy") {
+            if (isPlayer) paddleHeight = 55;
+            if (isEnemy) enemyHeight = 55;
+        }
+        if (e.type.id === "turboPlayer") {
+            if (isPlayer) playerSpeed = 8.5;
+            if (isEnemy) enemySpeed = 8.5;
+        }
+        if (e.type.id === "bigBall") ballSize = 22;
+
+        if (e.type.id === "freezeEnemy" && isEnemy) enemyFrozen = true;
+        if (e.type.id === "confuseEnemy" && isEnemy) enemyConfused = true;
+        if (e.type.id === "invertPlayer" && isPlayer) invertActive = true;
+    }
 
     const curveFx = activeEffects.find((e) => e.type.id === "curve");
     if (curveFx) {
@@ -504,7 +560,17 @@ function checkCollisions() {
         // Winkel je nach Trefferposition, Geschwindigkeit aus der
         // Balance-Tabelle (modus-abhängig, mit Obergrenze)
         const speed = Math.min(Math.abs(ballSpeedX) + cfg.ballSpeedGain, cfg.maxBallSpeed);
-        const angle = normalized * (Math.PI / 3.2);
+
+        // Abprallwinkel begrenzen: Bei Kanten-Treffern wurde der Ball
+        // früher zu steil abgeschossen (bis ca. 56°). Die X-Geschwindigkeit
+        // brach dann stark ein und der Ball "verlangsamte" das Feld entlang.
+        // Jetzt wird der Winkel auf maximal 45° gekappt, sodass X immerhin
+        // noch ~70 % der Gesamtgeschwindigkeit behält.
+        const MAX_BOUNCE_ANGLE = Math.PI / 4;
+        let angle = normalized * (Math.PI / 3.2);
+        if (Math.abs(angle) > MAX_BOUNCE_ANGLE) {
+            angle = Math.sign(angle) * MAX_BOUNCE_ANGLE;
+        }
 
         ballSpeedX = Math.cos(angle) * speed;
         ballSpeedY = Math.sin(angle) * speed;
@@ -580,14 +646,15 @@ function update(dt) {
     }
 
     // Ball Bewegung in Sub-Steps (verhindert Durchrutschen)
-    const dx = ballSpeedX * dt;
-    const dy = ballSpeedY * dt;
+    // Geschwindigkeit wird pro Teil-Schritt neu ausgelesen, damit eine Wand-Kollision
+    // (ballSpeedY *= -1) sofort greift und der Ball nicht am oberen/unteren Rand
+    // "kleben" bleiben kann.
     const maxStep = 4; // max. Pixel pro Teil-Schritt
-    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / maxStep));
+    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(ballSpeedX), Math.abs(ballSpeedY)) * dt / maxStep));
 
     for (let i = 0; i < steps; i++) {
-        ballX += dx / steps;
-        ballY += dy / steps;
+        ballX += ballSpeedX * dt / steps;
+        ballY += ballSpeedY * dt / steps;
 
         if (checkCollisions()) return; // Punkt gefallen -> Anstoß
     }
@@ -794,16 +861,6 @@ function drawPowerUp(now) {
     ctx.textBaseline = "middle";
     ctx.fillText(type.glyph, 0, 1);
 
-    // Seiten-Badge: welche Seite wird getroffen?
-    const badge = type.side === "player" ? "DU" : type.side === "enemy" ? "CPU" : "BEIDE";
-    ctx.font = "bold 9px Arial";
-    const bw = ctx.measureText(badge).width + 8;
-    ctx.fillStyle = "rgba(0,0,0,0.75)";
-    roundRectPath(-bw / 2, r + 15, bw, 13, 6);
-    ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(badge, 0, r + 22);
-
     ctx.restore();
 }
 
@@ -863,7 +920,7 @@ function drawChip(x, y, h, e, now) {
 function drawEffectChips(now) {
     const groups = { player: [], ball: [], enemy: [] };
     for (const e of activeEffects) {
-        if (groups[e.type.side]) groups[e.type.side].push(e);
+        if (groups[e.target]) groups[e.target].push(e);
     }
 
     ctx.save();
@@ -934,7 +991,7 @@ function drawToast(now) {
     const w1 = ctx.measureText(line1).width + 50;
 
     ctx.font = "bold 15px Arial";
-    const line2 = sideLabelOf(type.side) + " · " + secs + "s";
+    const line2 = sideLabelOf(toast.target) + " · " + secs + "s";
     const w2 = ctx.measureText(line2).width + 30;
 
     const plaqueW = Math.max(w1, w2);
@@ -979,6 +1036,9 @@ function drawToast(now) {
 applyDifficulty();
 setActiveMode("normal");
 resetBallWithCountdown();
+
+// Auf Handy ins Querformat drehen, damit das Spielfeld gut sichtbar ist
+lockLandscape();
 
 // Erstes Power-Up nach 12-25 s, danach alle 24-42 s
 scheduleNextPowerUp(true);
