@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaysGamez – Flappy Neon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="game-header">
+        <a href="../../index.html" class="back-btn">⟵ Zurück zur Startseite</a>
+        <h1 id="title">Flappy<span>Neon</span></h1>
+        <p class="tagline">Tippe oder drücke Leertaste – durch die Lücken lotsen</p>
+    </header>
+
+    <div id="scoreBar">
+        <span id="score">Score: 0</span>
+        <span id="best">Best: 0</span>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hint">Leertaste, Klick oder Touch = hüpfen · <b>R</b> = Neustart</div>
+
+    <div id="controls"><button id="restartBtn">Neustart</button></div>
+
+    <script src="game.js"></script>
+</body>
+</html>

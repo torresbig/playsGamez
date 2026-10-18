@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaysGamez – Spider Swing</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="game-header">
+        <a href="../../index.html" class="back-btn">⟵ Zurück zur Startseite</a>
+        <h1 id="title">Spider<span>Swing</span></h1>
+        <p class="tagline">Schwing dich durch die Stadt – klicke zum Seilwerfen, <b>S</b> zum Schwingen</p>
+    </header>
+
+    <div id="scoreBar">
+        <span id="score">Distanz: 0 m</span>
+        <span id="best">Best: 0 m</span>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hint">Klicke auf die Stadt, um ein Seil zu schießen · <b>S</b> = Seil loslassen / neu schießen · <b>R</b> = Neustart</div>
+
+    <div id="controls"><button id="restartBtn">Neustart</button></div>
+
+    <script src="game.js"></script>
+</body>
+</html>

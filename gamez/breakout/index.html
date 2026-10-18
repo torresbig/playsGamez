@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaysGamez – Neon Breakout</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="game-header">
+        <a href="../../index.html" class="back-btn">⟵ Zurück zur Startseite</a>
+        <h1 id="title">Neon<span>Breakout</span></h1>
+        <p class="tagline">Zerstöre alle Steine mit dem Ball und dem Schläger</p>
+    </header>
+
+    <div id="scoreBar">
+        <span id="score">Score: 0</span>
+        <span id="best">Best: 0</span>
+        <span id="lives">Leben: 3</span>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hint">Maus oder Pfeiltasten zum Bewegen · <b>R</b> = Neustart</div>
+
+    <div id="controls"><button id="restartBtn">Neustart</button></div>
+
+    <script src="game.js"></script>
+</body>
+</html>

@@ -398,6 +398,162 @@ a.game-card:hover .play-btn {
     color: #9fd9e2;
 }
 
+/* --- Spider Swing Vorschau --- */
+.spiderman-thumb {
+    background: #0b0b16;
+    position: relative;
+}
+.sm-body {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    margin-left: -10px;
+    width: 20px;
+    height: 20px;
+    background: #d00;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #d00;
+    transform: rotate(45deg);
+}
+.sm-web {
+    position: absolute;
+    top: 14px;
+    width: 2px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, #00eaff);
+    left: 50%;
+    transform-origin: top center;
+}
+.sm-web-l { margin-left: -6px; transform: rotate(-20deg); }
+.sm-web-r { margin-left: 4px; transform: rotate(20deg); animation-delay: -0.5s; }
+.sm-anchor {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    margin-left: -4px;
+    width: 8px;
+    height: 8px;
+    background: #00eaff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00eaff;
+    animation: smPulse 2s ease-in-out infinite;
+}
+@keyframes smPulse {
+    0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -4px) scale(1.2); opacity: 0.7; }
+}
+
+/* --- Snake Vorschau --- */
+.snake-thumb {
+    background: #0a0a0a;
+    position: relative;
+}
+.snake-head {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    margin-left: -8px;
+    width: 16px;
+    height: 16px;
+    background: #00eaff;
+    border-radius: 4px;
+    box-shadow: 0 0 10px #00eaff;
+}
+.snake-body {
+    position: absolute;
+    bottom: 30px;
+    left: 42px;
+    width: 12px;
+    height: 12px;
+    background: #00b894;
+    border-radius: 4px;
+    box-shadow: 0 0 8px #00b894;
+}
+.snake-food {
+    position: absolute;
+    top: 22px;
+    right: 30px;
+    width: 10px;
+    height: 10px;
+    background: #ff3e3e;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ff3e3e;
+}
+
+/* --- Breakout Vorschau --- */
+.breakout-thumb {
+    background: #07070a;
+    position: relative;
+}
+.bo-paddle {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    margin-left: -24px;
+    width: 48px;
+    height: 7px;
+    background: #00eaff;
+    border-radius: 3px;
+    box-shadow: 0 0 10px #00eaff;
+}
+.bo-ball {
+    position: absolute;
+    bottom: 34px;
+    left: 50%;
+    margin-left: -5px;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #fff;
+}
+.bo-brick {
+    position: absolute;
+    top: 22px;
+    width: 26px;
+    height: 10px;
+    border-radius: 2px;
+}
+.bo-b1 { left: 30px; background: #ff3e3e; box-shadow: 0 0 6px #ff3e3e; }
+.bo-b2 { left: 62px; background: #ffb300; box-shadow: 0 0 6px #ffb300; }
+.bo-b3 { left: 94px; background: #00eaff; box-shadow: 0 0 6px #00eaff; }
+
+/* --- Flappy Vorschau --- */
+.flappy-thumb {
+    background: #0d1b2a;
+    position: relative;
+}
+.fp-bird {
+    position: absolute;
+    bottom: 44px;
+    left: 30%;
+    width: 14px;
+    height: 10px;
+    background: #ffd700;
+    border-radius: 3px;
+    box-shadow: 0 0 8px #ffd700;
+}
+.fp-pipe {
+    position: absolute;
+    width: 22px;
+    background: #00eaff;
+    box-shadow: 0 0 8px #00eaff;
+}
+.fp-pipe-top {
+    top: 14px;
+    height: 70px;
+    left: 60%;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+.fp-pipe-bottom {
+    bottom: 14px;
+    height: 70px;
+    left: 60%;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
 /* --- Footer --- */
 footer {
     text-align: center;
