@@ -33,31 +33,78 @@ const BASE_CLEAR = [0, 100, 300, 500, 800];
 const CLEAR_NAMES = ["", "SINGLE", "DOUBLE", "TRIPLE", "TETRIS!"];
 
 /* ============================================================
-   STEINE
+   STEINE (SHAPES)
 
-   Jeder Stein startet in einer Matrix; gedreht wird über
-   Matrix-Rotation (90° im/entgegen dem Uhrzeigersinn).
-   Farben im PlaysGamez-Neon-Look wie beim Pong.
+   Jeder Eintrag ist eine Matrix aus 0 und 1:
+     1 = gefüllte Zelle (gehört zum Stein)
+     0 = leere Zelle
+
+   Beispiel T (3×3):
+     [[0, 1, 0],
+      [1, 1, 1],
+      [0, 0, 0]]
+
+   Hinweise:
+   - Leere äußere Reihen/Spalten sind für die reine Anzeige nicht nötig,
+     werden aber aus Konsistenzgründen stehen gelassen. So bleibt jede
+     Matrix gleich groß, was das Rotieren und die Kollisionsprüfung
+     einfacher macht.
+   - Wird eine Matrix gedreht, tauschen Breite und Höhe die Plätze.
+     Deshalb sollte jede Form am besten quadratisch sein (z. B. 3×3
+     oder 4×4), damit die Wand-Kicks und der Startplatz stabil bleiben.
+   - Jeder Schlüssel hier braucht einen Eintrag in COLORS und (optional)
+     in SPAWN_WEIGHTS weiter unten.
 ============================================================ */
 
 const SHAPES = {
+    // Klassische Tetriminos (offizieller 7er-Satz)
     I: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
     O: [[1, 1], [1, 1]],
     T: [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
     S: [[0, 1, 1], [1, 1, 0], [0, 0, 0]],
     Z: [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
     J: [[1, 0, 0], [1, 1, 1], [0, 0, 0]],
-    L: [[0, 0, 1], [1, 1, 1], [0, 0, 0]]
+    L: [[0, 0, 1], [1, 1, 1], [0, 0, 0]],
+    // Ungewöhnliche Zusatz-Steine (alle 3×3, nutzen die gleichen Wand-Kicks wie J/L/S/T/Z)
+    X: [[0, 1, 0], [1, 1, 1], [0, 1, 0]],   // Kreuz / X – symmetrisch, sperrig in der Mitte
+    W: [[1, 0, 0], [1, 1, 0], [0, 1, 1]],   // Treppe / W – ungleichmäßig, schwer zu stapeln
+    H: [[1, 0, 1], [1, 1, 1], [1, 0, 1]],   // H – hohl in der Mitte, braucht gezielte Platzierung
+    P: [[1, 1, 0], [1, 1, 1], [0, 0, 0]]    // P – 2×2-Block mit einem Anhängsel unten rechts
 };
 
 const COLORS = {
+    // Klassische Tetriminos
     I: "#00eaff", // Cyan
     O: "#ffd500", // Gelb
     T: "#a200ff", // Lila
     S: "#00ff88", // Grün
     Z: "#ff0044", // Rot
     J: "#2d6bff", // Blau
-    L: "#ff9500"  // Orange
+    L: "#ff9500", // Orange
+    // Ungewöhnliche Zusatz-Steine
+    X: "#ff00ff", // Magenta
+    W: "#00ff00", // Hellgrün
+    H: "#ffff00", // Neon-Gelb
+    P: "#ff8800"  // Dunkelorange
+};
+
+/* ============================================================
+   SPAWN-WAHRscheinlichkeit (Beutel-System)
+
+   Der Beutel enthält jeden Stein so oft wie sein Gewicht angibt.
+   Wird er leer, wird er neu gefüllt und per Fisher-Yates gemischt.
+
+   Standard-Tetriminos: Gewicht 10  (alle gleich häufig, wie beim
+                        klassischen Tetris-Beutel)
+   Zusatz-Steine:       Gewicht 3   (deutlich seltener)
+   Ändere die Werte hier, um das Spawn-Verhalten anzupassen.
+============================================================ */
+
+const SPAWN_WEIGHTS = {
+    // Klassische Tetriminos – alle gleich oft
+    I: 10, O: 10, T: 10, S: 10, Z: 10, J: 10, L: 10,
+    // Ungewöhnliche Zusatz-Steine – seltener
+    X: 3,  W: 3,  H: 3,  P: 3
 };
 
 /* ============================================================
@@ -211,8 +258,15 @@ function roundRectPath(x, y, w, h, r) {
 
 function takeFromBag() {
     if (bag.length === 0) {
-        bag = Object.keys(SHAPES);
-        // Fisher-Yates-Mischung, damit jeder Stein genau einmal vorkommt
+        bag = [];
+        // Beutel füllen: jeder Stein so oft wie sein Gewicht vorsieht
+        for (const type of Object.keys(SHAPES)) {
+            const weight = SPAWN_WEIGHTS[type] || 1;
+            for (let i = 0; i < weight; i++) {
+                bag.push(type);
+            }
+        }
+        // Fisher-Yates-Mischung, damit die Reihenfolge zufällig ist
         for (let i = bag.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [bag[i], bag[j]] = [bag[j], bag[i]];
@@ -384,7 +438,8 @@ function finishClear() {
     score += gained;
 
     lines += count;
-    level = Math.min(20, Math.floor(lines / 10) + 1);
+    // Alle 8 gelöschten Zeilen = ein Level mehr (früher: alle 10)
+    level = Math.min(20, Math.floor(lines / 8) + 1);
 
     toast = {
         text: CLEAR_NAMES[count],
@@ -398,7 +453,9 @@ function finishClear() {
 }
 
 function dropInterval() {
-    // Level 1 ≈ 1000ms, Level 10 ≈ 170ms, ab Level 15 feste 70ms-Decke
+    // Fall-Intervall in Millisekunden.
+    // Level 1 ≈ 1000 ms, Level 5 ≈ 452 ms, Level 10 ≈ 170 ms, ab Level 15 feste 70 ms-Decke.
+    // Je höher das Level, desto kleiner das Intervall → desto schneller fällt der Stein.
     return Math.max(70, Math.round(1000 * Math.pow(0.82, level - 1)));
 }
 
