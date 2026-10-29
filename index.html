@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#00eaff">
     <title>PlaysGamez – Arcade Games</title>
     <link rel="stylesheet" href="styles/style_main.css">
+    <noscript><style>.game-card,.game-card2{opacity:1!important;transform:none!important;}</style></noscript>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/2848/2848888.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2848/2848888.png">
@@ -34,6 +35,21 @@
         <h1 id="title">Plays<span>Gamez</span></h1>
         <p class="tagline">Retro-Arcade-Games direkt im Browser spielen</p>
     </header>
+
+    <!-- --- Suche & Filter --- -->
+    <section class="toolbar">
+        <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input id="gameSearch" type="search" placeholder="Spiel suchen …" aria-label="Spiel suchen">
+        </div>
+        <div class="filters" role="tablist" aria-label="Filter">
+            <button class="filter-btn active" data-filter="all">Alle</button>
+            <button class="filter-btn" data-filter="classic">Klassiker</button>
+            <button class="filter-btn" data-filter="action">Action</button>
+            <button class="filter-btn" data-filter="sport">Sport</button>
+        </div>
+        <div class="stats"><span id="gameCount">0</span> Spiele</div>
+    </section>
 
     <!-- --- Spielliste --- -->
     <main>
@@ -337,6 +353,71 @@
 
     <!-- Service Worker Registrierung (PWA / Offline) -->
     <script>
+        // --- Portal: Suche, Filter, Zähler ---
+        (function () {
+            const cards = Array.from(document.querySelectorAll('.game-card, .game-card2'));
+            const categories = {
+                pingpong: 'classic', tetris: 'classic', snake: 'classic', breakout: 'classic',
+                flappy: 'classic', stone: 'classic', reaction: 'classic', spiderman: 'classic',
+                race: 'action', shooter: 'action', spaceblaster: 'action', ninjarush: 'action',
+                skaterush: 'action', crashderby: 'action', aircombat: 'action', archery: 'action',
+                basketball: 'sport', football: 'sport', boxing: 'sport', tennissmash: 'sport'
+            };
+            cards.forEach((card) => {
+                const href = card.getAttribute('href') || '';
+                const key = (href.match(/gamez\/([^/]+)\//) || [])[1] || '';
+                card.dataset.category = categories[key] || 'classic';
+            });
+
+            const search = document.getElementById('gameSearch');
+            const countEl = document.getElementById('gameCount');
+            const filters = document.querySelectorAll('.filter-btn');
+            let activeFilter = 'all';
+
+            function applyFilters() {
+                const q = (search.value || '').trim().toLowerCase();
+                let visible = 0;
+                cards.forEach((card) => {
+                    const text = card.textContent.toLowerCase();
+                    const cat = card.dataset.category;
+                    const matchesSearch = !q || text.includes(q);
+                    const matchesFilter = activeFilter === 'all' || cat === activeFilter;
+                    const show = matchesSearch && matchesFilter;
+                    card.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+                countEl.textContent = visible;
+            }
+
+            search.addEventListener('input', applyFilters);
+            filters.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    filters.forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeFilter = btn.dataset.filter;
+                    applyFilters();
+                });
+            });
+
+            countEl.textContent = cards.length;
+            applyFilters();
+
+            // --- Sanftes Einblenden der Karten ---
+            if ('IntersectionObserver' in window) {
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach((e) => {
+                        if (e.isIntersecting) {
+                            e.target.classList.add('in-view');
+                            io.unobserve(e.target);
+                        }
+                    });
+                }, { threshold: 0.12 });
+                cards.forEach((c) => io.observe(c));
+            } else {
+                cards.forEach((c) => c.classList.add('in-view'));
+            }
+        })();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')

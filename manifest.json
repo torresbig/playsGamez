@@ -3,6 +3,7 @@
   "short_name": "PlaysGamez",
   "description": "Retro-Arcade-Games direkt im Browser spielen – Ping Pong, Tetris, Snake, Breakout, Flappy, Race, Shooter, Spider Swing und mehr.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0a0a0a",
