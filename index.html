@@ -48,7 +48,12 @@
             <button class="filter-btn" data-filter="action">Action</button>
             <button class="filter-btn" data-filter="sport">Sport</button>
         </div>
-        <div class="stats"><span id="gameCount">0</span> Spiele</div>
+        <div class="stats"><span id="gameCount">0</span> <span id="gamesLabel">Spiele</span></div>
+        <select id="langSelect" class="lang-select" aria-label="Sprache">
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="zh">🇨🇳 中文</option>
+        </select>
     </section>
 
     <!-- --- Spielliste --- -->
@@ -202,20 +207,6 @@
                 </div>
             </a>
 
-            <a class="game-card2" href="gamez/spaceblaster/index.html">
-                <div class="game-thumb sb-thumb">
-                    <span class="sb-ship"></span>
-                    <span class="sb-enemy sb-enemy1"></span>
-                    <span class="sb-enemy sb-enemy2"></span>
-                    <span class="sb-shot"></span>
-                </div>
-                <div class="game-info">
-                    <h2>Space Blaster</h2>
-                    <p>Schnelles Weltraum-Action – ziehe zum Bewegen, Feuer automatisch, zerstöre alle Aliens!</p>
-                    <span class="play-btn">▶ Spielen</span>
-                </div>
-            </a>
-
             <a class="game-card2" href="gamez/ninjarush/index.html">
                 <div class="game-thumb nr-thumb">
                     <span class="nr-ninja"></span>
@@ -307,18 +298,7 @@
                 </div>
             </a>
 
-            <a class="game-card2" href="gamez/aircombat/index.html">
-                <div class="game-thumb ac-thumb">
-                    <span class="ac-plane"></span>
-                    <span class="ac-enemy"></span>
-                    <span class="ac-shot"></span>
-                </div>
-                <div class="game-info">
-                    <h2>Air Combat</h2>
-                    <p>Luftkampf – fliege, schieße Raketen und schieße Gegner ab!</p>
-                    <span class="play-btn">▶ Spielen</span>
-                </div>
-            </a>
+           
 
             <a class="game-card2" href="gamez/tennissmash/index.html">
                 <div class="game-thumb ts-thumb">
@@ -333,17 +313,6 @@
                 </div>
             </a>
 
-            <div class="game-card coming-soon">
-                <div class="game-thumb">
-                    <span class="question-mark">?</span>
-                </div>
-                <div class="game-info">
-                    <h2>Bald verfügbar</h2>
-                    <p>Weitere Spiele sind bereits in Arbeit – bleib dran!</p>
-                    <span class="play-btn disabled">▶ Kommt bald</span>
-                </div>
-            </div>
-
         </section>
     </main>
 
@@ -351,6 +320,7 @@
         <p>© 2026 PlaysGamez – Spiel. Gewinn. Wiederholen. by TulixPro</p>
     </footer>
 
+    <script src="lang.js"></script>
     <!-- Service Worker Registrierung (PWA / Offline) -->
     <script>
         // --- Portal: Suche, Filter, Zähler ---
@@ -367,6 +337,7 @@
                 const href = card.getAttribute('href') || '';
                 const key = (href.match(/gamez\/([^/]+)\//) || [])[1] || '';
                 card.dataset.category = categories[key] || 'classic';
+                card.dataset.gameKey = key;
             });
 
             const search = document.getElementById('gameSearch');
@@ -402,6 +373,8 @@
             countEl.textContent = cards.length;
             applyFilters();
 
+            window.__portalCards = cards;
+
             // --- Sanftes Einblenden der Karten ---
             if ('IntersectionObserver' in window) {
                 const io = new IntersectionObserver((entries) => {
@@ -416,6 +389,52 @@
             } else {
                 cards.forEach((c) => c.classList.add('in-view'));
             }
+        })();
+
+        // --- Sprachumschaltung ---
+        (function () {
+            const select = document.getElementById('langSelect');
+            const cards = window.__portalCards || [];
+            const tagline = document.querySelector('.tagline');
+            const search = document.getElementById('gameSearch');
+            const gamesLabel = document.getElementById('gamesLabel');
+            const footerP = document.querySelector('footer p');
+            const playButtons = document.querySelectorAll('.play-btn');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            function applyLanguage(lang) {
+                const t = (window.I18N && window.I18N[lang]) || (window.I18N && window.I18N.de);
+                if (!t) return;
+                document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+                if (tagline) tagline.textContent = t.tagline;
+                if (search) search.placeholder = t.searchPlaceholder;
+                if (gamesLabel) gamesLabel.textContent = t.gamesLabel;
+                if (footerP) footerP.textContent = t.footer;
+                playButtons.forEach((b) => { b.textContent = t.play; });
+                filterBtns.forEach((btn) => {
+                    const key = btn.dataset.filter;
+                    if (t.filters && t.filters[key]) btn.textContent = t.filters[key];
+                });
+                cards.forEach((card) => {
+                    const key = card.dataset.gameKey;
+                    const g = t.games && t.games[key];
+                    if (g) {
+                        const h2 = card.querySelector('h2');
+                        const p = card.querySelector('p');
+                        if (h2) h2.textContent = g.title;
+                        if (p) p.textContent = g.desc;
+                    }
+                });
+                try { localStorage.setItem('playsgamez_lang', lang); } catch (e) {}
+            }
+
+            let saved = 'de';
+            try { saved = localStorage.getItem('playsgamez_lang') || 'de'; } catch (e) {}
+            if (!window.I18N || !window.I18N[saved]) saved = 'de';
+            select.value = saved;
+            applyLanguage(saved);
+
+            select.addEventListener('change', () => applyLanguage(select.value));
         })();
 
         if ('serviceWorker' in navigator) {

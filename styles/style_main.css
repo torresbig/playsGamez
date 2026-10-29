@@ -108,7 +108,7 @@ body::before {
 .game-card2 {
     width: 340px;
     background: #111;
-    border: 2px solid var(--secondary-color);
+    border: 2px solid var(--main-color);
     border-radius: 10px;
     overflow: hidden;
     text-decoration: none;
@@ -1273,7 +1273,7 @@ body::before {
 }
 
 .game-card2 {
-    border-color: rgba(255, 0, 68, 0.4);
+    border-color: rgba(0, 234, 255, 0.4);
 }
 
 .game-card:hover,
@@ -1282,7 +1282,7 @@ body::before {
 }
 
 .game-card:hover { border-color: var(--main-color); box-shadow: 0 22px 46px rgba(0,0,0,0.55), 0 0 30px rgba(0, 234, 255, 0.45); }
-.game-card2:hover { border-color: var(--secondary-color); box-shadow: 0 22px 46px rgba(0,0,0,0.55), 0 0 30px rgba(255, 0, 68, 0.45); }
+.game-card2:hover { border-color: var(--main-color); box-shadow: 0 22px 46px rgba(0,0,0,0.55), 0 0 30px rgba(0, 234, 255, 0.45); }
 
 .game-card::before,
 .game-card2::before {
@@ -1345,9 +1345,9 @@ body::before {
 }
 
 .game-card2 .play-btn {
-    color: var(--secondary-color);
-    background: rgba(255, 0, 68, 0.12);
-    border-color: rgba(255, 0, 68, 0.4);
+    color: var(--main-color);
+    background: rgba(0, 234, 255, 0.12);
+    border-color: rgba(0, 234, 255, 0.4);
 }
 
 .game-card:hover .play-btn,
@@ -1359,6 +1359,21 @@ body::before {
     opacity: 0.55;
     filter: grayscale(0.4);
     pointer-events: none;
+}
+
+.lang-select {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 234, 255, 0.35);
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+.lang-select:focus {
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 3px rgba(0, 234, 255, 0.18);
 }
 
 footer {

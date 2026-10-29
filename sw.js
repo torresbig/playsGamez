@@ -2,6 +2,7 @@ const CACHE_NAME = 'playsgamez-v2';
 const ASSETS = [
   './',
   './index.html',
+  './lang.js',
   './styles/style_main.css',
   './manifest.json',
   // Spiele (alle HTML/JS/CSS werden gecacht, sobald sie angefragt werden)
