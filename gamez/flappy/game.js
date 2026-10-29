@@ -119,6 +119,17 @@ function update() {
 function draw() {
     ctx.fillStyle = '#0b1320';
     ctx.fillRect(0, 0, W, H);
+    
+    // Add subtle background animation
+    ctx.fillStyle = 'rgba(0, 234, 255, 0.03)';
+    for (let i = 0; i < 30; i++) {
+        ctx.fillRect((frame * 0.3 + i * 27) % W, (i * 53) % H, 1, 1);
+    }
+    
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    for (let i = 0; i < 40; i++) {
+        ctx.fillRect((frame + i * 51) % W, (i * 73) % H, 1.2, 1.2);
+    }
 
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     for (let i = 0; i < 40; i++) {
@@ -150,6 +161,20 @@ function draw() {
     ctx.restore();
     ctx.shadowBlur = 0;
 
+    // Particle effect on game over
+    const particles = [];
+    for (let i = 0; i < 20; i++) {
+        particles.push({
+            x: bird.x,
+            y: bird.y,
+            vx: (Math.random() - 0.5) * 100,
+            vy: (Math.random() - 0.5) * 100,
+            life: 0.8,
+            tt: 0,
+            color: i > 10 ? '#ffd700' : '#00eaff'
+        });
+    }
+    
     if (over) {
         ctx.fillStyle = 'rgba(0,0,0,0.65)';
         ctx.fillRect(0, 0, W, H);
@@ -163,6 +188,19 @@ function draw() {
         ctx.fillStyle = '#fff';
         ctx.font = '18px Arial';
         ctx.fillText('Score: ' + score + '   R = Neustart', W / 2, H / 2 + 22);
+        
+        // Animate particles
+        ctx.save();
+        for (const p of particles) {
+            p.tt += 0.016;
+            ctx.globalAlpha = 1 - p.tt / p.life;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x - 3, p.y - 3, 6, 6);
+            p.x += p.vx * 0.016;
+            p.y += p.vy * 0.016;
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
     } else if (!started) {
         ctx.fillStyle = 'rgba(255,255,255,0.45)';
         ctx.font = '17px Arial';

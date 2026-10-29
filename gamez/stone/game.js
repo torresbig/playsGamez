@@ -58,13 +58,14 @@ function spawn() {
 }
 
 function explode(x, y, color) {
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 20; i++) {
         parts.push({
             x: x, y: y,
-            vx: (Math.random() - 0.5) * 180,
-            vy: (Math.random() - 0.5) * 180,
-            life: 0.5, tt: 0,
-            color: color || '#ff0044'
+            vx: (Math.random() - 0.5) * 200,
+            vy: (Math.random() - 0.5) * 200,
+            life: 0.8, tt: 0,
+            color: color || '#ff0044',
+            spark: Math.random() > 0.5
         });
     }
 }
@@ -216,6 +217,12 @@ function drawParts() {
         ctx.globalAlpha = 1 - p.tt / p.life;
         ctx.fillStyle = p.color;
         ctx.fillRect(p.x, p.y, 4, 4);
+        // Spark effect
+        if (p.spark) {
+            ctx.fillStyle = "#ffd700";
+            ctx.globalAlpha = 0.8;
+            ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+        }
     }
     ctx.globalAlpha = 1;
 }

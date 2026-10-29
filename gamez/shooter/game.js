@@ -1,5 +1,5 @@
 const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas ? canvas.getContext("2d") : null;
 
 /* ============================================================
    GRUNDWERTE
@@ -21,6 +21,23 @@ const POINTER_SPEED = 950;    // wie schnell das Schiff dem Finger folgt
 const BULLET_VY = -860;       // eigene Schüsse (nach oben)
 const EBULLET_VY = 330;       // Gegner-Schüsse
 const EBULLET_R = 6;
+
+// Particle system
+let particles = [];
+
+function createParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 200,
+            vy: (Math.random() - 0.5) * 200,
+            life: 0.6 + Math.random() * 0.4,
+            tt: 0,
+            color: color
+        });
+    }
+}
 
 const INVULN_MS = 1800;       // Unverwundbarkeit nach Treffer
 const SPAWN_START = 700;      // Abstand zwischen Gegner-Spawns (ms)
@@ -222,7 +239,7 @@ let spawnTimer = 0;
 let waveGapMs = 0;       // Pause zwischen den Wellen
 let bossGapMs = 0;       // Pause vor Endboss
 let powerups = [];       // { kind, x, y }
-let particles = [];
+particles = [];
 let stars = [];
 let toast = null;        // { text, sub, color, startAt }
 
@@ -1236,6 +1253,7 @@ function handleCollisions() {
         if (b.hit) continue;
         if (!overlaps(b.x, b.y, EBULLET_R * 2, EBULLET_R * 2, px, py, PLAYER_W, PLAYER_H, 12)) continue;
         b.hit = true;
+        createParticles(px, py, '#ff0044', 15);  // Particle effect on player hit
         playerHit();
     }
     eBullets = eBullets.filter((b) => !b.hit);
@@ -1245,6 +1263,7 @@ function handleCollisions() {
         if (overlaps(e.x, e.y, e.w, e.h, px, py, PLAYER_W, PLAYER_H, 14)) {
             e.hp = 0;
             explosion(e.x, e.y, e.color, 18);
+            createParticles(e.x, e.y, e.color, 25);  // Particle effect on player collision
             playerHit();
         }
     }
