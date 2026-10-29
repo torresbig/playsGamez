@@ -1,0 +1,41 @@
+:root { --main-color: #ff9500; }
+* { box-sizing: border-box }
+body {
+    margin: 0; min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column; align-items: center;
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #000000);
+    font-family: 'Segoe UI', Arial, sans-serif; color: white; overflow-x: hidden;
+}
+body::before {
+    content: ""; position: fixed; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(255,149,0,.05) 0 2px, transparent 2px 6px);
+    animation: mv 12s linear infinite; pointer-events: none;
+}
+@keyframes mv { from { transform: translateY(0); } to { transform: translateY(-200px); } }
+.game-header { text-align: center; margin-top: 40px; position: relative; z-index: 1; }
+.back-btn {
+    display: inline-block; margin-bottom: 10px; color: var(--main-color);
+    text-decoration: none; font-size: 15px; border: 1px solid var(--main-color);
+    padding: 6px 14px; border-radius: 8px; transition: 0.25s;
+}
+.back-btn:hover { background: var(--main-color); color: black; box-shadow: 0 0 15px var(--main-color); }
+#title { text-align: center; margin: 8px 0 4px; font-size: clamp(28px, 6vw, 52px);
+    color: var(--main-color); text-shadow: 0 0 20px var(--main-color), 0 0 40px var(--main-color); letter-spacing: 2px; }
+#title span { color: #fff; }
+.tagline { margin: 6px 0 0; font-size: 16px; color: #9fd9e2; letter-spacing: 1px; }
+#scoreBar { display: flex; gap: 22px; font-size: 17px; margin: 10px 0 6px; color: #cfd8dc; justify-content: center; }
+#score { color: #fff !important } #best { color: var(--main-color) !important; font-weight: 700 }
+#gameCanvas {
+    display: block; width: min(450px, 94vw); height: min(500px, 75vh);
+    border: 3px solid var(--main-color); box-shadow: 0 0 30px var(--main-color), inset 0 0 40px #001111;
+    background: #050508; border-radius: 10px; touch-action: none; user-select: none;
+}
+#hint { text-align: center; margin: 8px 0 0; font-size: 14px; color: #607d8b; }
+#controls { display: flex; gap: 12px; margin: 12px 0 8px; }
+button {
+    background: #111; color: #fff; border: 2px solid var(--main-color); padding: 12px 26px;
+    font-size: 18px; border-radius: 10px; cursor: pointer; transition: 0.25s;
+    box-shadow: 0 0 10px var(--main-color); font-family: inherit;
+}
+button:hover { background: var(--main-color); color: #000; transform: translateY(-3px); box-shadow: 0 0 20px var(--main-color); }
+@media (max-width: 640px) { #gameCanvas { width: 94vw; height: 50vh; } #title { font-size: 32px; } }

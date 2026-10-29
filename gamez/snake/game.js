@@ -64,6 +64,25 @@ document.addEventListener('keydown', (e) => {
 
 document.getElementById('restartBtn').onclick = reset;
 
+// On-Screen D-Pad Touch-Steuerung
+document.querySelectorAll('#dpad button').forEach((btn) => {
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const dir = btn.dataset.dir;
+        if (dir === 'up' && dir.y === 0) nextDir = { x: 0, y: -1 };
+        if (dir === 'down' && dir.y === 0) nextDir = { x: 0, y: 1 };
+        if (dir === 'left' && dir.x === 0) nextDir = { x: -1, y: 0 };
+        if (dir === 'right' && dir.x === 0) nextDir = { x: 1, y: 0 };
+    }, { passive: false });
+    btn.addEventListener('mousedown', (e) => {
+        const dir = btn.dataset.dir;
+        if (dir === 'up' && dir.y === 0) nextDir = { x: 0, y: -1 };
+        if (dir === 'down' && dir.y === 0) nextDir = { x: 0, y: 1 };
+        if (dir === 'left' && dir.x === 0) nextDir = { x: -1, y: 0 };
+        if (dir === 'right' && dir.x === 0) nextDir = { x: 1, y: 0 };
+    });
+});
+
 function update() {
     if (over || paused) return;
     dir = nextDir;

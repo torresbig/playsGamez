@@ -37,4 +37,35 @@ button {
     box-shadow: 0 0 10px var(--main-color); font-family: inherit;
 }
 button:hover { background: var(--main-color); color: #000; transform: translateY(-3px); box-shadow: 0 0 20px var(--main-color); }
-@media (max-width: 640px) { #gameCanvas { width: 94vw; height: 55vh; } #title { font-size: 32px; } }
+/* D-Pad für Touch-Steuerung */
+#dpad {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: min(300px, 92vw);
+    margin: 10px 0 20px;
+}
+#dpad button {
+    background: #111;
+    color: #fff;
+    border: 2px solid var(--main-color);
+    padding: 16px 0;
+    font-size: 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--main-color);
+    font-family: inherit;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+#dpad button:active {
+    background: var(--main-color);
+    color: #000;
+}
+
+@media (max-width: 640px), (hover: none) {
+    #dpad { display: grid; }
+    #gameCanvas { width: 94vw; height: 50vh; }
+    #title { font-size: 32px; }
+}

@@ -2,9 +2,14 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#00eaff">
     <title>PlaysGamez – Arcade Games</title>
     <link rel="stylesheet" href="styles/style_main.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/2848/2848888.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2848/2848888.png">
 </head>
 
 <body>
@@ -121,7 +126,6 @@
                     <span class="snake-food"></span>
                 </div>
                 <div class="game-info">
-                    <h21>buggy</h21>
                     <h2>Neon Snake</h2>
                     <p>Klassische Schlange – fress die Punkte, werde länger und stürze nicht in die Wände.</p>
                     <span class="play-btn">▶ Spielen</span>
@@ -137,23 +141,178 @@
                     <span class="bo-brick bo-b3"></span>
                 </div>
                 <div class="game-info">
-                    <h21>buggy</h21>
                     <h2>Neon Breakout</h2>
                     <p>Schlag den Ball mit dem Schläger und zerstöre alle Steine – je höher das Level, desto schneller der Ball.</p>
                     <span class="play-btn">▶ Spielen</span>
                 </div>
             </a>
 
-            <a class="game-card2" href="gamez/flappy/index.html">
+            <a class="game-card" href="gamez/flappy/index.html">
                 <div class="game-thumb flappy-thumb">
                     <span class="fp-bird"></span>
                     <span class="fp-pipe fp-pipe-top"></span>
                     <span class="fp-pipe fp-pipe-bottom"></span>
                 </div>
                 <div class="game-info">
-                    <h21>buggy</h21>
                     <h2>Flappy Neon</h2>
                     <p>Tippe oder drücke Leertaste, um den Vogel durch die Lücken zu lotsen – wie weit kommst du?</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/stone/index.html">
+                <div class="game-thumb stone-thumb">
+                    <span class="ss-rock"></span>
+                    <span class="ss-rock ss-rock2"></span>
+                    <span class="ss-hammer"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Stone Smash</h2>
+                    <p>Zerstöre fallende Steine mit Tipps oder Klicks – je mehr du triffst, desto schneller werden sie.</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/reaction/index.html">
+                <div class="game-thumb reaction-thumb">
+                    <span class="rx-target"></span>
+                    <span class="rx-target rx-target2"></span>
+                    <span class="rx-click"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Reaction Test</h2>
+                    <p>Wie schnell bist du? Tippe so schnell wie möglich auf das Ziel – misst deine Reaktionszeit in Millisekunden.</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/spaceblaster/index.html">
+                <div class="game-thumb sb-thumb">
+                    <span class="sb-ship"></span>
+                    <span class="sb-enemy sb-enemy1"></span>
+                    <span class="sb-enemy sb-enemy2"></span>
+                    <span class="sb-shot"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Space Blaster</h2>
+                    <p>Schnelles Weltraum-Action – ziehe zum Bewegen, Feuer automatisch, zerstöre alle Aliens!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/ninjarush/index.html">
+                <div class="game-thumb nr-thumb">
+                    <span class="nr-ninja"></span>
+                    <span class="nr-obstacle nr-obs1"></span>
+                    <span class="nr-obstacle nr-obs2"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Ninja Rush</h2>
+                    <p>Endloslauf-Action – tippe zum Springen, vermeide Hindernisse, lauf so weit wie möglich!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/basketball/index.html">
+                <div class="game-thumb bb-thumb">
+                    <span class="bb-ball"></span>
+                    <span class="bb-hoop"></span>
+                    <span class="bb-line"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Basketball Shot</h2>
+                    <p>Wurfphysik – ziehe zurück, ziele und schieße den Ball in den Korb!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/football/index.html">
+                <div class="game-thumb fb-thumb">
+                    <span class="fb-ball"></span>
+                    <span class="fb-goal"></span>
+                    <span class="fb-keeper"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Football Penalty</h2>
+                    <p>Elfmeterschießen – schieße am Torwart vorbei und erziele Tore!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/boxing/index.html">
+                <div class="game-thumb bx-thumb">
+                    <span class="bx-player"></span>
+                    <span class="bx-enemy"></span>
+                    <span class="bx-glove"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Box Fight</h2>
+                    <p>Boxkampf – schlage den Gegner K.O. und überlebe!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/crashderby/index.html">
+                <div class="game-thumb cd-thumb">
+                    <span class="cd-car"></span>
+                    <span class="cd-enemy"></span>
+                    <span class="cd-boom"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Crash Derby</h2>
+                    <p>Zerstörungsderby – renne andere Autos kaputt und überlebe!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/skaterush/index.html">
+                <div class="game-thumb sk-thumb">
+                    <span class="sk-skater"></span>
+                    <span class="sk-obs1"></span>
+                    <span class="sk-obs2"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Skate Rush</h2>
+                    <p>Endloslauf – tippe zum Springen, vermeide Hindernisse, lauf so weit wie möglich!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/archery/index.html">
+                <div class="game-thumb ar-thumb">
+                    <span class="ar-bow"></span>
+                    <span class="ar-arrow"></span>
+                    <span class="ar-target"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Archery</h2>
+                    <p>Bogenschießen – ziehe die Sehne zurück, ziele und schieße ins Ziel!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/aircombat/index.html">
+                <div class="game-thumb ac-thumb">
+                    <span class="ac-plane"></span>
+                    <span class="ac-enemy"></span>
+                    <span class="ac-shot"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Air Combat</h2>
+                    <p>Luftkampf – fliege, schieße Raketen und schieße Gegner ab!</p>
+                    <span class="play-btn">▶ Spielen</span>
+                </div>
+            </a>
+
+            <a class="game-card2" href="gamez/tennissmash/index.html">
+                <div class="game-thumb ts-thumb">
+                    <span class="ts-player"></span>
+                    <span class="ts-enemy"></span>
+                    <span class="ts-ball"></span>
+                </div>
+                <div class="game-info">
+                    <h2>Tennis Smash</h2>
+                    <p>Tennis – schlag den Ball über das Netz und gewinne Rallyes!</p>
                     <span class="play-btn">▶ Spielen</span>
                 </div>
             </a>
@@ -175,5 +334,16 @@
     <footer>
         <p>© 2026 PlaysGamez – Spiel. Gewinn. Wiederholen. by TulixPro</p>
     </footer>
+
+    <!-- Service Worker Registrierung (PWA / Offline) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('SW registriert:', reg.scope))
+                    .catch((err) => console.log('SW-Fehler:', err));
+            });
+        }
+    </script>
 
 </body>

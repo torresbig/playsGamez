@@ -37,4 +37,35 @@ button {
     box-shadow: 0 0 10px var(--main-color); font-family: inherit;
 }
 button:hover { background: var(--main-color); color: #000; transform: translateY(-3px); box-shadow: 0 0 20px var(--main-color); }
-@media (max-width: 640px) { #gameCanvas { width: 94vw; height: 50vh; } #title { font-size: 32px; } }
+/* Touch-Steuerung für Breakout */
+#touchControls {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: min(300px, 92vw);
+    margin: 10px 0 20px;
+}
+#touchControls button {
+    background: #111;
+    color: #fff;
+    border: 2px solid var(--main-color);
+    padding: 16px 0;
+    font-size: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--main-color);
+    font-family: inherit;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+#touchControls button:active {
+    background: var(--main-color);
+    color: #000;
+}
+
+@media (max-width: 640px), (hover: none) {
+    #touchControls { display: grid; }
+    #gameCanvas { width: 94vw; height: 45vh; }
+    #title { font-size: 32px; }
+}

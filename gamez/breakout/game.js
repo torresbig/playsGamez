@@ -105,8 +105,32 @@ canvas.addEventListener('touchmove', (e) => {
 
 document.getElementById('restartBtn').onclick = reset;
 
+// On-Screen Touch-Steuerung für Breakout
+let touchLeft = false, touchRight = false;
+document.querySelectorAll('#touchControls button').forEach((btn) => {
+    const action = btn.dataset.action;
+    const start = () => {
+        if (action === 'left') touchLeft = true;
+        if (action === 'right') touchRight = true;
+        if (action === 'launch') ball.moving = true;
+    };
+    const stop = () => {
+        if (action === 'left') touchLeft = false;
+        if (action === 'right') touchRight = false;
+    };
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); start(); }, { passive: false });
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); stop(); }, { passive: false });
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('mouseup', stop);
+    btn.addEventListener('mouseleave', stop);
+});
+
 function update() {
     if (over || won) return;
+
+    // Touch-Paddle-Bewegung
+    if (touchLeft && paddle.x > 0) paddle.x -= paddle.dx;
+    if (touchRight && paddle.x < W - paddle.w) paddle.x += paddle.dx;
 
     if (!ball.moving) {
         ball.x = paddle.x + paddle.w / 2;

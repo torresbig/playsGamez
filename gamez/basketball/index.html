@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>PlaysGamez – Basketball Shot</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../styles/style_main.css">
+</head>
+<body>
+    <header class="game-header">
+        <a href="../../index.html" class="back-btn">⟵ Zurück zur Startseite</a>
+        <h1 id="title">Basket<span>ball</span></h1>
+        <p class="tagline">Wurfphysik – ziehe zurück, ziele und schieße!</p>
+    </header>
+
+    <div id="scoreBar">
+        <span id="score">Score: 0</span>
+        <span id="best">Best: 0</span>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hint">👆 Ziehe zurück zum Zielen · Loslassen zum Werfen · <b>R</b> = Neustart</div>
+
+    <div id="controls"><button id="restartBtn">Neustart</button></div>
+
+    <script src="game.js"></script>
+</body>
+</html>

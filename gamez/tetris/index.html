@@ -2,14 +2,19 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>PlaysGamez – Tetris</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../styles/style_main.css">
 </head>
 
 <body>
-
-    <h1 id="title">PlaysGamez</h1>
+    <header class="game-header">
+        <a href="../../index.html" class="back-btn">⟵ Zurück zur Startseite</a>
+        <h1 id="title">Tet<span>ris</span></h1>
+        <p class="tagline">Staple die Steine und lösche Reihen</p>
+    </header>
 
     <canvas id="gameCanvas" width="560" height="720"></canvas>
 

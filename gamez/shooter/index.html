@@ -2,18 +2,23 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>PlaysGamez – Neon Blaster</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../styles/style_main.css">
 </head>
 
 <body>
-
-    <h1 id="title">PlaysGamez</h1>
+    <header class="game-header">
+        <a href="../../index.html" class="back-btn">⟵ Zurück zur Startseite</a>
+        <h1 id="title">Neon<span>Blaster</span></h1>
+        <p class="tagline">Zerstöre alle Gegner – automatisches Feuer</p>
+    </header>
 
     <canvas id="gameCanvas" width="640" height="960"></canvas>
 
-    <p id="hint">Pfeile / WASD bewegen · Ziehen am Spielfeld (Touch) · Feuer ist automatisch · P Pause · R Neustart</p>
+    <p id="hint">Pfeile / WASD bewegen · Ziehen am Spielfeld (Touch) · Feuer automatisch · P Pause · R Neustart</p>
 
     <div id="controls">
         <button id="pauseBtn">Pause</button>

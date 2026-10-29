@@ -574,6 +574,480 @@ a.game-card:hover .play-btn {
     border-top-right-radius: 6px;
 }
 
+/* --- Stone Smash Vorschau --- */
+.stone-thumb {
+    background: #0a0a0a;
+    position: relative;
+}
+.ss-rock {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: #555;
+    border-radius: 4px;
+    box-shadow: 0 0 8px #ff0044;
+    top: 30px;
+    left: 40px;
+    animation: ssFall 1.2s ease-in-out infinite;
+}
+.ss-rock2 {
+    left: auto;
+    right: 40px;
+    top: 60px;
+    animation-delay: 0.4s;
+    animation-duration: 1.6s;
+}
+.ss-hammer {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    margin-left: -14px;
+    width: 28px;
+    height: 8px;
+    background: #ffd700;
+    border-radius: 3px;
+    box-shadow: 0 0 10px #ffd700;
+}
+@keyframes ssFall {
+    0% { transform: translateY(-30px); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(130px); opacity: 0; }
+}
+
+/* --- Reaction Test Vorschau --- */
+.reaction-thumb {
+    background: #0d1b2a;
+    position: relative;
+}
+.rx-target {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: #00ff88;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #00ff88;
+    top: 40px;
+    left: 50%;
+    margin-left: -13px;
+    animation: rxPulse 1.4s ease-in-out infinite;
+}
+.rx-target2 {
+    top: auto;
+    bottom: 40px;
+    left: auto;
+    right: 40px;
+    background: #ff0044;
+    box-shadow: 0 0 12px #ff0044;
+    animation-delay: 0.6s;
+    animation-duration: 1s;
+}
+.rx-click {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    background: #ffd700;
+    border-radius: 50%;
+    margin: -7px 0 0 -7px;
+    box-shadow: 0 0 10px #ffd700;
+    animation: rxClick 1.8s ease-in-out infinite;
+}
+@keyframes rxPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+}
+@keyframes rxClick {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.3; }
+}
+
+/* --- Space Blaster Vorschau --- */
+.sb-thumb {
+    background: #050508;
+    position: relative;
+}
+.sb-ship {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    margin-left: -12px;
+    width: 24px;
+    height: 24px;
+    background: #00eaff;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    box-shadow: 0 0 12px #00eaff;
+}
+.sb-enemy {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #ff0044;
+    box-shadow: 0 0 10px #ff0044;
+    border-radius: 3px;
+}
+.sb-enemy1 { top: 30px; left: 30px; }
+.sb-enemy2 { top: 60px; right: 30px; animation-delay: 0.5s; }
+.sb-shot {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    width: 4px;
+    height: 12px;
+    background: #fff;
+    margin-left: -2px;
+    box-shadow: 0 0 8px #fff;
+    animation: sbShot 1.2s ease-in-out infinite;
+}
+@keyframes sbShot {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-100px); opacity: 0; }
+}
+
+/* --- Ninja Rush Vorschau --- */
+.nr-thumb {
+    background: #0a0a0a;
+    position: relative;
+}
+.nr-ninja {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 16px;
+    height: 24px;
+    background: #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+    border-radius: 2px;
+}
+.nr-obstacle {
+    position: absolute;
+    bottom: 30px;
+    background: #ff0044;
+    box-shadow: 0 0 8px #ff0044;
+    border-radius: 3px;
+}
+.nr-obs1 { left: 40%; width: 30px; height: 14px; animation: nrJump 1.6s ease-in-out infinite; }
+.nr-obs2 { left: 65%; width: 20px; height: 28px; animation-delay: 0.6s; animation-duration: 1.4s; }
+@keyframes nrJump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+}
+
+/* --- Basketball Vorschau --- */
+.bb-thumb {
+    background: #050508;
+    position: relative;
+}
+.bb-ball {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 16px;
+    height: 16px;
+    background: #ff8c00;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ff8c00;
+}
+.bb-hoop {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 20px;
+    height: 4px;
+    background: #ffd700;
+    border-radius: 2px;
+}
+.bb-line {
+    position: absolute;
+    top: 60px;
+    right: 30px;
+    width: 2px;
+    height: 40px;
+    background: rgba(255,215,0,0.3);
+}
+
+/* --- Football Vorschau --- */
+.fb-thumb {
+    background: #1a1a2e;
+    position: relative;
+}
+.fb-ball {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 14px;
+    height: 20px;
+    background: #ffffff;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 0 0 10px #ffffff;
+    transform: rotate(15deg);
+}
+.fb-goal {
+    position: absolute;
+    top: 40px;
+    right: 30px;
+    width: 40px;
+    height: 30px;
+    border: 2px solid #00ff88;
+    border-bottom: none;
+    box-shadow: 0 0 10px #00ff88;
+}
+.fb-keeper {
+    position: absolute;
+    bottom: 70px;
+    left: 60%;
+    width: 16px;
+    height: 20px;
+    background: #ff0044;
+    box-shadow: 0 0 10px #ff0044;
+}
+
+/* --- Boxing Vorschau --- */
+.bx-thumb {
+    background: #0a0a0a;
+    position: relative;
+}
+.bx-player {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 16px;
+    height: 24px;
+    background: #00eaff;
+    box-shadow: 0 0 10px #00eaff;
+    border-radius: 2px;
+}
+.bx-enemy {
+    position: absolute;
+    bottom: 30px;
+    left: 60%;
+    width: 16px;
+    height: 24px;
+    background: #ff0044;
+    box-shadow: 0 0 10px #ff0044;
+    border-radius: 2px;
+}
+.bx-glove {
+    position: absolute;
+    bottom: 40px;
+    left: 55px;
+    width: 14px;
+    height: 14px;
+    background: #ffd700;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ffd700;
+    animation: bxPunch 1.4s ease-in-out infinite;
+}
+@keyframes bxPunch {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(20px); }
+}
+
+/* --- Crash Derby Vorschau --- */
+.cd-thumb {
+    background: #1a1a2e;
+    position: relative;
+}
+.cd-car {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 24px;
+    height: 14px;
+    background: #00eaff;
+    box-shadow: 0 0 10px #00eaff;
+    border-radius: 4px;
+}
+.cd-enemy {
+    position: absolute;
+    bottom: 30px;
+    left: 60%;
+    width: 20px;
+    height: 12px;
+    background: #ff0044;
+    box-shadow: 0 0 10px #ff0044;
+    border-radius: 4px;
+}
+.cd-boom {
+    position: absolute;
+    bottom: 50px;
+    left: 55%;
+    width: 12px;
+    height: 12px;
+    background: #ffd700;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ffd700;
+    animation: cdBoom 1.2s ease-in-out infinite;
+}
+@keyframes cdBoom {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* --- Skate Rush Vorschau --- */
+.sk-thumb {
+    background: #0a0a0a;
+    position: relative;
+}
+.sk-skater {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 14px;
+    height: 22px;
+    background: #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+    border-radius: 2px;
+}
+.sk-obs1 {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    width: 28px;
+    height: 12px;
+    background: #ff0044;
+    box-shadow: 0 0 8px #ff0044;
+    border-radius: 3px;
+    animation: skJump 1.5s ease-in-out infinite;
+}
+.sk-obs2 {
+    position: absolute;
+    bottom: 30px;
+    left: 70%;
+    width: 20px;
+    height: 24px;
+    background: #a200ff;
+    box-shadow: 0 0 8px #a200ff;
+    border-radius: 3px;
+    animation-delay: 0.5s;
+    animation-duration: 1.3s;
+}
+@keyframes skJump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-25px); }
+}
+
+/* --- Archery Vorschau --- */
+.ar-thumb {
+    background: #050508;
+    position: relative;
+}
+.ar-bow {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 6px;
+    height: 30px;
+    background: #a200ff;
+    border-radius: 3px;
+    box-shadow: 0 0 8px #a200ff;
+}
+.ar-arrow {
+    position: absolute;
+    bottom: 42px;
+    left: 50px;
+    width: 20px;
+    height: 2px;
+    background: #ffd700;
+    box-shadow: 0 0 6px #ffd700;
+}
+.ar-target {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #00eaff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00eaff;
+}
+
+/* --- Air Combat Vorschau --- */
+.ac-thumb {
+    background: #0a0a0a;
+    position: relative;
+}
+.ac-plane {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 20px;
+    height: 12px;
+    background: #00eaff;
+    clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+    box-shadow: 0 0 10px #00eaff;
+}
+.ac-enemy {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 18px;
+    height: 10px;
+    background: #ff0044;
+    clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+    box-shadow: 0 0 10px #ff0044;
+    animation: acFly 1.6s ease-in-out infinite;
+}
+.ac-shot {
+    position: absolute;
+    bottom: 50px;
+    left: 60px;
+    width: 4px;
+    height: 10px;
+    background: #ffd700;
+    box-shadow: 0 0 6px #ffd700;
+    animation: acShot 1.4s ease-in-out infinite;
+}
+@keyframes acFly {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+@keyframes acShot {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-80px); opacity: 0; }
+}
+
+/* --- Tennis Smash Vorschau --- */
+.ts-thumb {
+    background: #1a1a2e;
+    position: relative;
+}
+.ts-player {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    width: 14px;
+    height: 22px;
+    background: #00eaff;
+    box-shadow: 0 0 10px #00eaff;
+    border-radius: 2px;
+}
+.ts-enemy {
+    position: absolute;
+    top: 30px;
+    left: 60%;
+    width: 14px;
+    height: 22px;
+    background: #ff0044;
+    box-shadow: 0 0 10px #ff0044;
+    border-radius: 2px;
+}
+.ts-ball {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ffffff;
+    animation: tsBall 1.4s ease-in-out infinite;
+}
+@keyframes tsBall {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+}
+
 /* --- Footer --- */
 footer {
     text-align: center;
